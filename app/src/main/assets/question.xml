@@ -1,0 +1,1630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<questions>
+
+    <item>
+        <question>1、什么是 Activity?</question>
+        <answer>四大组件之一,一般的,一个用户交互界面对应一个 activity
+            setContentView() ,activity 是Context的子类,同时实现了window.callback和keyevent.callback, 可以处理与窗体
+            用户交互的事件.
+            我开发常用的的有 FragmentActivitiyListActivity ,PreferenceActivity ,TabAcitivty 等...
+        </answer>
+    </item>
+
+    <item>
+        <question>2、请描述一下 Activity 生命周期</question>
+        <answer>Activity 从创建到销毁有多种状态,从一种状态到另一种状态时会激发相应的回调方法,这些回 调方法包括:onCreate onStart onResume
+            onPause onStop onDestroy
+            其实这些方法都是两两对应的,onCreate 创建与 onDestroy 销毁;
+            onStart 可见与 onStop 不可见;onResume 可编辑(即焦点)与 onPause;
+            如果界面有共同的特点或者功能的时候,还会自己定义一个 BaseActivity. 进度对话框的显示与销毁
+        </answer>
+    </item>
+
+    <item>
+        <question>3、常 见 的 Activity 类 型 有 FragmentActivitiy , ListActivity , TabAcitivty 等。请描述一下
+            Activity 生命周期
+        </question>
+        <answer>Activity 从创建到销毁有多种状态,从一种状态到另一种状态时会激发相应的回调方法,这些回调方法包括:onCreate onStart onResume
+            onPause onStop onDestroy 其实这些方法都是两两对应的,onCreate 创建与 onDestroy 销毁;
+            onStart 可见与 onStop 不可见;onResume 可编辑(即焦点)与 onPause。
+        </answer>
+    </item>
+
+    <item>
+        <question>4、如何保存 Activity 的状态?</question>
+        <answer>Activity 的状态通常情况下系统会自动保存的,只有当我们需要保存额外的数据时才需要使用到 这样的功能。
+            一般来说, 调用onPause()和onStop()方法后的activity实例仍然存在于内存中,activity的所有 信息和状态数据不会消失, 当 activity
+            重新回到前台之后, 所有的改变都会得到保留。
+            但是当系统内存不足时, 调用 onPause()和 onStop()方法后的 activity 可能会被系统摧毁, 此时 内存中就不会存有该 activity
+            的实例对象了。如果之后这个 activity 重新回到前台, 之前所作的改变 就会消失。为了避免此种情况的发生, 我们可以覆写 onSaveInstanceState()方法。
+            onSaveInstanceState()方法接受一个 Bundle 类型的参数, 开发者可以将状态数据存储到这个 Bundle对象中, 这样即使activity被系统摧毁,
+            当用户重新启动这个activity而调用它的onCreate() 方法时, 上述的 Bundle 对象会作为实参传递给 onCreate()方法, 开发者可以从 Bundle
+            对象中取出 保存的数据, 然后利用这些数据将 activity 恢复到被摧毁之前的状态。
+            需要注意的是, onSaveInstanceState()方法并不是一定会被调用的, 因为有些场景是不需要保存 状态数据的. 比如用户按下BACK键退出activity时,
+            用户显然想要关闭这个activity, 此时是没有必 要保存数据以供下次恢复的, 也就是 onSaveInstanceState()方法不会被调用. 如果调用
+            onSaveInstanceState()方法, 调用将发生在 onPause()或 onStop()方法之前。
+        </answer>
+    </item>
+
+    <item>
+        <question>5、两个 Activity 之间跳转时必然会执行的是哪几个方法?</question>
+        <answer>一般情况下比如说有两个activity,分别叫A,B,当在A里面激活B组件的时候,A会调用 onPause() 方法,然后 B 调用 onCreate()
+            ,onStart(), onResume()。
+            这个时候 B 覆盖了窗体, A 会调用 onStop()方法. 如果 B 是个透明的,或者是对话框的样式, 就 不会调用 A 的 onStop()方法。
+        </answer>
+    </item>
+    <item>
+        <question>6、横竖屏切换时 Activity 的生命周期</question>
+        <answer>此时的生命周期跟清单文件里的配置有关系。
+            1.不设置 Activity 的 android:configChanges 时,切屏会重新调用各个生命周期默认首先销毁
+            当前 activity,然后重新加载。
+            2.设置 Activity android:configChanges="orientation|keyboardHidden|screenSize"时,切
+            屏不会重新调用各个生命周期,只会执行 onConfigurationChanged 方法。 通常在游戏开发, 屏幕的朝向都是写死的。
+        </answer>
+    </item>
+    <item>
+        <question>7、如何将一个 Activity 设置成窗口的样式</question>
+        <answer>只需要给我们的 Activity 配置如下属性即可。
+            android:theme="@android:style/Theme.Dialog"
+        </answer>
+    </item>
+    <item>
+        <question>8、如何退出 Activity?如何安全退出已调用多个 Activity 的
+            Application?
+        </question>
+        <answer>
+            1、通常情况用户退出一个 Activity 只需按返回键,我们写代码想退出 activity 直接调用 finish()方法 就行。
+            2、记录打开的 Activity:
+            每打开一个 Activity,就记录下来。在需要退出时,关闭每一个 Activity 即可。
+            //伪代码
+            List lists ;
+            // 在 application 全局的变量里面 lists = new ArrayList();
+            lists.add(this);
+            for(Activity activity: lists)
+            {
+            activity.finish();
+            }
+            lists.remove(this);
+            3、发送特定广播:
+            在需要结束应用时,发送一个特定的广播,每个 Activity 收到广播后,关闭即可。
+            //给某个 activity 注册接受接受广播的意图 registerReceiver(receiver, filter)
+            //如果过接受到的是 关闭 activity 的广播 就调用 finish()方法 把当前的 activity finish()掉
+            4、递归退出
+            在打开新的 Activity 时使用 startActivityForResult,然后自己加标志,在 onActivityResult 中 处理,递归关闭。
+            5、其实 也可以通过 intent 的 flag 来实现 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) 激活一个新的
+            activity。此时如果该任务栈中已经有该 Activity,那么系统会把这个 Activity上面的所有 Activity 干掉。其实相当于给 Activity
+            配置的启动模式为 SingleTop。
+        </answer>
+    </item>
+    <item>
+        <question>9、Activity 的四种启动模式,singletop 和 singletask 区别是什么? 一般书签的使用模式是 singletop,那为什么不使用
+            singletask?
+        </question>
+        <answer>singleTop 跟 standard 模式比较类似。唯一的区别就是,当跳转的对象是位于栈顶的 activity(应 该可以理解为用户眼前所 看到的
+            activity)时,程序将不会生成一个新的 activity 实例,而是直接跳 到现存于栈顶的那个 activity 实例。拿上面的例子来说,当 Act1 为
+            singleTop 模式时,执行跳转 后栈里面依旧只有一个实例,如果现在按返回键程序将直接退出。
+            singleTask 模式和 singleInstance 模式都是只创建一个实例的。在这种模式下,无论跳转的对 象是不是位于栈顶的
+            activity,程序都不会生成一个新的实例(当然前提是栈里面已经有这个实例)。 这种模式相当有用,在以后的多 activity
+            开发中,常会因为跳转的关系导致同个页面生成多个实例, 这个在用户体验上始终有点不好,而如果你将对应的 activity 声明为 singleTask 模式,这种问题将
+            不复存在。在主页的 Activity 很常用
+        </answer>
+    </item>
+    <item>
+        <question>10、Android 中的 Context, Activity,Appliction 有什么区别?</question>
+        <answer>相同:Activity 和 Application 都是 Context 的子类。
+            Context 从字面上理解就是上下文的意思,在实际应用中它也确实是起到了管理上下文环境中各个参 数和变量的总用,方便我们可以简单的访问到各种资源。
+            不同:维护的生命周期不同。 Context 维护的是当前的 Activity 的生命周期,Application 维护 的是整个项目的生命周期。
+            使用 context 的时候,小心内存泄露,防止内存泄露,注意一下几个方面:
+            1. 不要让生命周期长的对象引用 activity context,即保证引用 activity 的对象要与 activity 本身
+            生命周期是一样的。
+            2. 对于生命周期长的对象,可以使用 application,context。
+            3. 避免非静态的内部类,尽量使用静态类,避免生命周期问题,注意内部类对外部对象引用导致 的生命周期变化。
+        </answer>
+    </item>
+    <item>
+        <question>11、两个 Activity 之间传递数据,除了 intent,广播接收者,content provider 还有啥?</question>
+        <answer>1)利用 static 静态数据,public static 成员变量 2)利用外部存储的传输,
+            例如 File 文件存储
+            SharedPreferences 首选项 Sqlite 数据库
+        </answer>
+    </item>
+    <item>
+        <question>12、Context 是什么?</question>
+        <answer>1、它描述的是一个应用程序环境的信息,即上下文。
+            2、该类是一个抽象(abstract class)类,Android 提供了该抽象类的具体实现类(ContextIml)。
+            3、通过它我们可以获取应用程序的资源和类,也包括一些应用级别操作,例如:启动一个 Activity, 发送广播,接受 Intent,信息,等。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>1、Service 是否在 main thread 中执行, service 里面是否能执行耗时的操 作?</question>
+        <answer>默认情况,如果没有显示的指 servic 所运行的进程, Service 和 activity 是运行在当前 app 所在进 程的 main thread(UI
+            主线程)里面。
+            service 里面不能执行耗时的操作(网络请求,拷贝数据库,大文件 )
+            特殊情况 ,可以在清单文件配置 service 执行所在的进程 ,让 service 在另外的进程中执行
+        </answer>
+    </item>
+    <item>
+        <question>2、Activity 怎么和 Service 绑定,怎么在 Activity 中启动自己对应的 Service?</question>
+        <answer>Activity 通过 bindService(Intent service, ServiceConnection conn, int flags)跟 Service
+            进行 绑定,当绑定成功的时候 Service 会将代理对象通过回调的形式传给 conn,这样我们就拿到了 Service 提供的服务代理对象。
+            在 Activity 中可以通过 startService 和 bindService 方法启动 Service。一般情况下如果想获取 Service
+            的服务对象那么肯定需要通过 bindService()方法,比如音乐播放器,第三方支付等。如 果仅仅只是为了开启一个后台任务那么可以使用 startService()方法。
+        </answer>
+    </item>
+    <item>
+        <question>3、请描述一下 Service 的生命周期</question>
+        <answer>Service 有绑定模式和非绑定模式,以及这两种模式的混合使用方式。不同的使用方法生命周期 方法也不同。
+            非绑定模式:当第一次调用 startService 的时候执行的方法依次为 onCreate()、 onStartCommand(),当 Service 关闭的时候调用
+            onDestory 方法。
+            绑定模式:第一次 bindService()的时候,执行的方法为 onCreate()、onBind()解除绑定的 时候会执行 onUnbind()、onDestory()。
+            上面的两种生命周期是在相对单纯的模式下的情形。我们在开发的过程中还必须注意 Service 实 例只会有一个,也就是说如果当前要启动的 Service
+            已经存在了那么就不会再次创建该 Service 当然 也不会调用 onCreate()方法。
+            一个 Service 可以被多个客户进行绑定,只有所有的绑定对象都执行了 onBind()方法后该 Service 才会销毁,不过如果有一个客户执行了
+            onStart()方法,那么这个时候如果所有的 bind 客户 都执行了 unBind()该 Service 也不会销毁。
+            Service 的生命周期图如下所示,帮助大家记忆。
+        </answer>
+    </item>
+    <item>
+        <question>4、什么是 IntentService?有何优点?</question>
+        <answer>我们通常只会使用 Service,可能 IntentService 对大部分同学来说都是第一次听说。那么看了
+            下面的介绍相信你就不再陌生了。如果你还是不了解那么在面试的时候你就坦诚说没用过或者不了解 等。并不是所有的问题都需要回答上来的。
+            一、IntentService 简介
+            IntentService 是 Service 的子类,比普通的 Service 增加了额外的功能。先看 Service 本身存在 两个问题:
+            Service 不会专门启动一条单独的进程,Service 与它所在应用位于同一个进程中;
+        </answer>
+    </item>
+
+    <item>
+        <question>1、请描述一下 BroadcastReceiver</question>
+        <answer>BroadCastReceiver 是 Android 四大组件之一，主要用于接收系统或者 app 发送的广播事件。
+            广播分两种：有序广播和无序广播。
+            内部通信实现机制：通过 Android 系统的 Binder 机制实现通信。
+            无序广播：完全异步，逻辑上可以被任何广播接收者接收到。优点是效率较高。缺点是一个接收者不
+            能将处理结果传递给下一个接收者，并无法终止广播 intent 的传播。
+            有序广播：按照被接收者的优先级顺序，在被接收者中依次传播。比如有三个广播接收者 A，B，C，
+            优先级是 A > B > C。那这个消息先传给 A，再传给 B，最后传给 C。每个接收者有权终止广播，比
+            如 B 终止广播，C 就无法接收到。此外 A 接收到广播后可以对结果对象进行操作，当广播传给 B 时，
+            B 可以从结果对象中取得 A 存入的数据。
+            在通过 Context.sendOrderedBroadcast(intent, receiverPermission, resultReceiver, scheduler,
+            initialCode, initialData, initialExtras)时我们可以指定 resultReceiver 广播接收者，这个接收者我们
+            可以认为是最终接收者，通常情况下如果比他优先级更高的接收者如果没有终止广播，那么他的
+            onReceive 会被执行两次，第一次是正常的按照优先级顺序执行，第二次是作为最终接收者接收。
+            如果比他优先级高的接收者终止了广播，那么他依然能接收到广播。
+            在我们的项目中经常使用广播接收者接收系统通知，比如开机启动、sd 挂载、低电量、外播电话、
+            锁屏等。
+            如果我们做的是播放器，那么监听到用户锁屏后我们应该将我们的播放之暂停等。
+        </answer>
+    </item>
+    <item>
+        <question>2、在 manifest 和代码中如何注册和使用 BroadcastReceiver</question>
+        <answer>在清单文件中注册广播接收者称为静态注册，在代码中注册称为动态注册。静态注册的广播接收
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            23
+            者只要 app 在系统中运行则一直可以接收到广播消息，动态注册的广播接收者当注册的 Activity 或
+            者 Service 销毁了那么就接收不到广播了。
+        </answer>
+    </item>
+    <item>
+        <question>3、BroadCastReceiver 的生命周期</question>
+        <answer>a. 广播接收者的生命周期非常短暂的，在接收到广播的时候创建，onReceive()方法结束之后销
+            毁；
+            b. 广播接收者中不要做一些耗时的工作，否则会弹出 Application No Response 错误对话框；
+            c. 最好也不要在广播接收者中创建子线程做耗时的工作，因为广播接收者被销毁后进程就成为了
+            空进程，很容易被系统杀掉；
+            d. 耗时的较长的工作最好放在服务中完成；
+        </answer>
+    </item>
+    <item>
+        <question>4、Android 引入广播机制的用意</question>
+        <answer>a. 从 MVC 的角度考虑(应用程序内) 其实回答这个问题的时候还可以这样问，android 为什么要有
+            那 4 大组件，现在的移动开发模型基本上也是照搬的 web 那一套 MVC 架构，只不过是改了点
+            嫁妆而已。android 的四大组件本质上就是为了实现移动或者说嵌入式设备上的 MVC 架构，它
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            24
+            们之间有时候是一种相互依存的关系，有时候又是一种补充关系，引入广播机制可以方便几大组
+            件的信息和数据交互。
+            b. 程序间互通消息(例如在自己的应用程序内监听系统来电)
+            c. 效率上(参考 UDP 的广播协议在局域网的方便性)
+            d. 设计模式上(反转控制的一种应用，类似监听者模式)
+        </answer>
+    </item>
+
+    <item>
+
+        <question>1、请介绍下 ContentProvider 是如何实现数据共享的</question>
+        <answer>
+            在 Android 中如果想将自己应用的数据（一般多为数据库中的数据）提供给第三发应用，那么
+            我们只能通过 ContentProvider 来实现了。
+            ContentProvider 是应用程序之间共享数据的接口。使用的时候首先自定义一个类继承
+            ContentProvider，然后覆写 query、insert、update、delete 等方法。因为其是四大组件之一因
+            此必须在 AndroidManifest 文件中进行注册。
+            把自己的数据通过 uri 的形式共享出去
+            android 系统下 不同程序 数据默认是不能共享访问
+            需要去实现一个类去继承 ContentProvider
+            public class PersonContentProvider extends ContentProvider{
+            public boolean onCreate(){
+            }
+            query(Uri, String[], String, String[], String)
+            insert(Uri, ContentValues)
+            update(Uri, ContentValues, String, String[])
+            delete(Uri, String, String[])
+            }
+        </answer>
+    </item>
+
+
+    <item>
+        <question>2、请介绍下 Android 的数据存储方式</question>
+        <answer>a. File 存储
+            b. SharedPreference 存储
+            c. ContentProvider 存储
+            d. SQLiteDataBase 存储
+            e. 网络存储
+        </answer>
+    </item>
+
+    <item>
+        <question>3、为什么要用 ContentProvider？它和 sql 的实现上有什么差别？</question>
+        <answer>ContentProvider 屏蔽了数据存储的细节,内部实现对用户完全透明,用户只需要关心操作数据的
+            uri 就可以了，ContentProvider 可以实现不同 app 之间共享。
+            Sql 也有增删改查的方法，但是 sql 只能查询本应用下的数据库。而 ContentProvider 还可
+            以去增删改查本地文件. xml 文件的读取等
+        </answer>
+    </item>
+
+
+    <item>
+        <question>4、说说 ContentProvider、ContentResolver、ContentObserver 之间的
+            关系
+        </question>
+        <answer>a. ContentProvider 内容提供者，用于对外提供数据
+            b. ContentResolver.notifyChange(uri)发出消息
+            c. ContentResolver 内容解析者，用于获取内容提供者提供的数据
+            d. ContentObserver 内容监听器，可以监听数据的改变状态
+            e. ContentResolver.registerContentObserver()监听消息。
+        </answer>
+    </item>
+
+    <item>
+        <question>
+            ContentObserver 内容观察者作用及特点
+        </question>
+        <answer>
+            ContentObserver 目的是观察(捕捉)特定 Uri引起的数据库的变化， 继而做一些相应的处理。
+            它类似于数据库技术中的触发器(Trigger)，当 ContentObserver 所观察的 Uri 发生变化时，便
+            会 触发 它 。 触发 器 分为 表 触发 器 、 行触 发 器， 相 应地 ContentObserver 也 分为 “表
+            “ContentObserver、“行”ContentObserver，当然这是与它所监听的 Uri MIME Type 有关的。
+        </answer>
+    </item>
+    <item>
+        <question>
+            注册ContentObserver 方法
+        </question>
+        <answer>
+            public final void registerContentObserver(Uri uri, boolean notifyForDescendents,
+            ContentObserver observer)
+            功能：为指定的 Uri 注册一个 ContentObserver 派生类实例，当给定的 Uri 发生改变时，回调
+            该实例对象去处理。
+            参数: uri 表示需要观察的 Uri
+            notifyForDescendents 为 false 表示精确匹配，即只匹配该 Uri。 为 true 表示可以同时匹配
+            其派生的Uri。
+        </answer>
+    </item>
+    <item>
+        <question>
+            取消注册ContentObserver 方法
+        </question>
+        <answer>
+            public final void unregisterContentObserver(ContentObserver observer)
+            功能：取消对给定Uri的观察
+            参数： observer ContentObserver的派生类实例
+        </answer>
+    </item>
+    <item>
+        <question>
+            ContentObserver 类介绍
+        </question>
+        <answer>
+            构造方法 ContentObserver(Handler h)
+            void onChange(boolean selfChange) 功能：当观察到的 Uri 发生变化时，回调该方法去处理。
+            所有 ContentObserver 的派生类都需要重载该方法去处理逻辑。
+            观察特定 Uri 的步骤如下：
+            1、创建我们特定的ContentObserver 派生类，必须重载父类构造方法，必须重载 onChange()
+            方法去处理回调后的功能实现
+            2 、 利 用 context.getContentResolover() 获 ContentResolover 对 象 ， 接 着 调 用
+            registerContentObserver()方法去注册内容观察者
+            3、在不需要时，需要手动的调用 unregisterContentObserver()去取消注册。
+        </answer>
+    </item>
+
+    <item>
+        <question>1、Intent 传递数据时，可以传递哪些类型数据？</question>
+        <answer>Intent 可以传递的数据类型非常的丰富，java 的基本数据类型和String 以及他们的数组形式
+            都可以，除此之外还可以传递实现了Serializable 和Parcelable 接口的对象。
+        </answer>
+    </item>
+    <item>
+        <question>2、Serializable 和Parcelable 的区别</question>
+        <answer>在使用内存的时候，Parcelable 类比Serializable 性能高，所以推荐使用Parcelable 类。
+            1．Serializable 在序列化的时候会产生大量的临时变量，从而引起频繁的GC。
+
+            2．Parcelable 不能使用在要将数据存储在磁盘上的情况。尽管Serializable 效率低点，但在这
+            种情况下，还是建议你用Serializable 。
+            实现：
+            1．Serializable 的实现，只需要继承Serializable 即可。这只是给对象打了一个标记，系统会
+            自动将其序列化。
+            2．Parcelabel 的实现，需要在类中添加一个静态成员变量CREATOR，这个变量需要继承
+            Parcelable.Creator 接口。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>3、请描述一下Intent 和IntentFilter</question>
+        <answer>Android 中通过Intent 对象来表示一条消息，一个Intent 对象不仅包含有这个消息的目的
+            地，还可以包含消息的内容，这好比一封Email，其中不仅应该包含收件地址，还可以包含具体的内
+            容。对于一个Intent 对象，消息“目的地”是必须的，而内容则是可选项。
+            通过Intent 可以实现各种系统组件的调用与激活.
+            IntentFilter: 可以理解为邮局或者是一个信笺的分拣系统…
+            这个分拣系统通过3 个参数来识别
+            Action: 动作view
+            Data: 数据uri uri
+            Category : 而外的附加信息
+            Action 匹配
+            Action 是一个用户定义的字符串，用于描述一个Android 应用程序组件，一个IntentFilter 可
+            以包含多个Action。在AndroidManifest.xml 的Activity 定义时可以在其intent-filter 节点
+            指定一个Action 列表用于标示Activity 所能接受的“动作”，
+
+            如果我们在启动一个Activity 时使用这样的Intent 对象：
+            Intent intent =new Intent();
+            intent.setAction("cn.itheima.action");
+
+            那么所有的Action 列表中包含了“cn.itheima”的Activity 都将会匹配成功。
+            Android 预定义了一系列的Action 分别表示特定的系统动作。这些Action 通过常量的方式
+            定义在android.content. Intent 中，以“ACTION_”开头。我们可以在Android 提供的文档中找
+            到它们的详细说明。
+            URI 数据匹配
+            一个Intent 可以通过URI 携带外部数据给目标组件。在intent-filter节点中，通过
+            data节点匹配外部数据。
+            mimeType 属性指定携带外部数据的数据类型，scheme 指定协议，host、port、path 指定
+            数据的位置、端口、和路径。
+            电话的uri tel: 12345
+            http://www.baidu.com
+            自己定义的uri itcast://cn.itcast/person/10
+            如果在Intent Filter 中指定了这些属性，那么只有所有的属性都匹配成功时URI 数据匹配才会
+            成功。
+            Category 类别匹配
+            intent-filter 节点中可以为组件定义一个Category 类别列表，当Intent 中包含这个列表
+            的所有项目时Category 类别匹配才会成功。
+        </answer>
+    </item>
+
+    <item>
+        <question>1、Android 中的动画有哪几类,它们的特点和区别是什么?</question>
+        <answer>
+            Android 中动画分为两种，一种是Tween 动画、还有一种是Frame 动画。
+            Tween 动画，这种实现方式可以使视图组件移动、放大、缩小以及产生透明度的变化；
+            Frame 动画，传统的动画方法，通过顺序的播放排列好的图片来实现，类似电影。
+        </answer>
+    </item>
+
+    <item>
+        <question>2、如何修改Activity 进入和退出动画</question>
+        <answer>
+            可以通过两种方式，一是通过定义Activity 的主题，二是通过覆写Activity
+            的overridePendingTransition 方法。
+        </answer>
+    </item>
+
+    <item>
+        <question>3、属性动画，例如一个button 从A 移动到B 点，B 点还是可以响应点
+            击事件，这个原理是什么？
+        </question>
+        <answer>
+            补间动画只是显示的位置变动，View 的实际位置未改变，表现为View 移动到其他地方，点击事
+            件仍在原处才能响应。而属性动画控件移动后事件相应就在控件移动后本身进行处理。
+        </answer>
+    </item>
+    <item>
+        <question>流式布局的特点以及应用场景</question>
+        <answer>场景：主要用于关键词搜索或者热门标签等场景</answer>
+    </item>
+    <item>
+        <question>自定义 ViewGroup,重点重写下面两个方法</question>
+        <answer>1)onMeasure:测量子 view 的宽高，设置自己的宽和高
+            2)onLayout:设置子 view 的位置。
+            onMeasure:根据子 view 的布局文件中属性，来为子 view 设置测量模式和测量值
+            测量=测量模式+测量值；测量模式有 3 种：
+            EXACTLY：表示设置了精确的值，一般当 childView 设置其宽、高为精确值、match_parent
+            时，ViewGroup 会将其设置为 EXACTLY；
+            AT_MOST：表示子布局被限制在一个最大值内，一般当 childView 设置其宽、高为
+            wrap_content 时，ViewGroup 会将其设置为 AT_MOST；
+            UNSPECIFIED：表示子布局想要多大就多大，一般出现在 AadapterView 的 item 的
+            heightMode 中、ScrollView 的 childView 的 heightMode 中；此种模式比较少见
+            3) LayoutParams ViewGroup LayoutParams :每个 ViewGroup 对应一个 LayoutParams; 即 ViewGroup ->
+            LayoutParams
+            getLayoutParams 不知道转为哪个对应的 LayoutParams ,其实很简单，就是如下：
+            子 View.getLayoutParams 得到的 LayoutParams 对应的就是 子 View 所在的父控件的
+            LayoutParams;
+            例如，LinearLayout 里面的子 view.getLayoutParams ->LinearLayout.LayoutParams
+            所以 咱们的FlowLayout 也需要一个LayoutParams， 由于上面的效果图是子View的 margin，
+            所以应该使用 MarginLayoutParams。即 FlowLayout->MarginLayoutParams
+        </answer>
+    </item>
+    <item>
+        <question>项目的流程</question>
+        <answer>立项：确定项目、负责人、开发的周期、成本、人力、物力\n需求：文档、原型图\n开发：编码 测试：测试人员上线：产品部门维护：修复新的 bug升级:改版、添加新的功能
+        </answer>
+    </item>
+    <item>
+        <question></question>
+        <answer></answer>
+    </item>
+
+    <item>
+        <question>简述 android 应用程序结构是哪些?</question>
+        <answer>Android 应用程序结构也就是讲我们的工程结构:src 目录是源代码目录,所有允许用户修改的 java 文件和用户自己添加的 java 文件都保存在这个 目录中
+            gen 目录是 1.5 版本新增的目录,用来保存 ADT 自动生成的 java 文件,例如 R.java 或 AIDL 文 件
+            注意:R.java 文件(非常重要)
+            a) R.java 文件是 ADT 自动生成的文件,包含对 drawable、layout 和 values 目录内的资源的引 用指针,Android 程序能够直接通过 R
+            类引用目录中的资源
+            b) R.java 文件不能手工修改,如果向资源目录中增加或删除了资源文件,则需要在工程名称上右 击,选择 Refresh 来更新 R.java 文件中的代码
+            c) R 类包含的几个内部类,分别与资源类型相对应,资源 ID 便保存在这些内部类中,例如子类 drawable 表示图像资源,内部的静态变量 icon 表示资源名称,其资源
+            ID 为 0x7f020000。一般情 况下,资源名称与资源文件名相同
+            android.jar 文件是 Android 程序所能引用的函数库文件,Android 通过平台所支持 API 都包含 在这个文件中
+            assets 目录用来存放原始格式的文件,例如音频文件、视频文件等二进制格式文件。此目录中的 资源不能被 R.java 文件索引。,所以只能以资截流的形式读取。一般情况下为空
+            layout 目录用来存放我们为每个界面写的布局文件
+            Strings.xml 文件是程序中的一些字符串的引用
+            AndroidManifest.xml 是 XML 格式的 Android 程序声明文件,包含了 Android 系统运行
+            Android 程序前所必须掌握的重要信息,这些信息包含应用程序名称、图标、包名称、模块组成、 授权和 SDK 最低版本等,而且每个 Android 程序必须在根目录下包含一个
+            AndroidManifest.xml 文件.注:AndroidMainfest.xml 文件:
+            1) AndroidManifest.xml 文件的根元素是 manifest,包含了 xmlns:android、package、 android:versionCode 和
+            android:versionName 共 4 个属性
+            2) xmlns:android 定义了 Android 的命名空间,值为 http://schemas.android.com/apk/res/android
+            3) package 定义了应用程序的包名称
+            4) android:versionCode 定义了应用程序的版本号,是一个整数值,数值越大说明版本越新, 但仅在程序内部使用,并不提供给应用程序的使用者
+            5) android:versionName 定义了应用程序的版本名称,是一个字符串,仅限于为用户提供一个 版本标识
+            6) manifest 元素仅能包含一个 application 元素,application 元素中能够声明 Android 程序中 最重要的四个组成部分,包括
+            Activity、Service、BroadcastReceiver 和 ContentProvider,所定 义的属性将影响所有组成部分
+            7) android:icon 定义了 Android 应用程序的图标,其中@drawable/icon 是一种资源引用方 式,表示资源类型是图像,资源名称为
+            icon,对应的资源文件为 res/drawable 目录下的 icon.png
+            8) android:label 则定义了 Android 应用程序的标签名称
+            default.properties 文件记录 Android 工程的相关设置,该文件不能手动修改,需右键单击工程 名称,选择“Properties”进行修改
+        </answer>
+    </item>
+    <item>
+        <question>请解释下 Android 程序运行时权限与文件系统权限的区别?</question>
+        <answer>apk 程序是运行在虚拟机上的,对应的是 Android 独特的权限机制,只有体现到文件系统上时使用 linux 的权限设置,(一)linux 文件系统上的权限
+            -rwxr-x--x system system 4156 2010-04-30 16:13 test.apk
+            代表的是相应的用户/用户组及其他人对此文件的访问权限,与此文件运行起来具有的权限完全 不相关。比如上面的例子只能说明 system 用户拥有对此文件的读写执行权限;system
+            组的用户对 此文件拥有读、执行权限;其他人对此文件只具有执行权限。而 test.apk 运行起来后可以干哪些事 情,跟这个就不相关了。千万不要看 apk 文件系统上属于
+            system/system 用户及用户组,或者 root/root 用户及用户组,就认为 apk 具有 system 或 root 权限
+            (二)Android 的权限规则
+            (1)Android 中的 apk 必须签名
+            (2)基于 UserID 的进程级别的安全机制 (3)默认 apk 生成的数据对外是不可见的 (4)AndroidManifest.xml 中的显式权限声明
+        </answer>
+    </item>
+    <item>
+        <question>Framework 工作方式及原理,Activity 是如何生成一个 view 的, 机制是什么?</question>
+        <answer>所有的框架都是基于反射 和 配置文件(manifest)的。
+            普通的情况:
+            Activity 创建一个 view 是通过 ondraw 画出来的, 画这个 view 之前呢,还会调用 onmeasure
+            方法来计算显示的大小. 特殊情况:
+            Surfaceview 是直接操作硬件的,因为 或者视频播放对帧数有要求,onDraw 效率太低,不够
+            使,Surfaceview 直接把数据写到显存。
+        </answer>
+    </item>
+    <item>
+        <question>多线程间通信和多进程之间通信有什么不同,分别怎么实现?</question>
+        <answer>一、进程间的通信方式
+            # 管道( pipe ):管道是一种半双工的通信方式,数据只能单向流动,而且只能在具有亲缘关系的 进程间使用。进程的亲缘关系通常是指父子进程关系。
+            # 有名管道 (namedpipe) : 有名管道也是半双工的通信方式,但是它允许无亲缘关系进程间的 通信。
+            # 信号量(semophore ) : 信号量是一个计数器,可以用来控制多个进程对共享资源的访问。它
+            常作为一种锁机制,防止某进程正在访问共享资源时,其他进程也访问该资源。因此,主要作为进 程间以及同一进程内不同线程之间的同步手段。
+            # 消息队列( messagequeue ) : 消息队列是由消息的链表,存放在内核中并由消息队列标识符
+            标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。 # 信号 (sinal ) :
+            信号是一种比较复杂的通信方式,用于通知接收进程某个事件已经发生。
+            # 共享内存(shared memory ) :共享内存就是映射一段能被其他进程所访问的内存,这段共享内 存由一个进程创建,但多个进程都可以访问。共享内存是最快的 IPC
+            方式,它是针对其他进程间 通信方式运行效率低而专门设计的。它往往与其他通信机制,如信号两,配合使用,来实现进程间 的同步和通信。
+            # 套接字(socket ) : 套解口也是一种进程间通信机制,与其他通信机制不同的是,它可用于不同
+            及其间的进程通信。二、线程间的通信方式 # 锁机制:包括互斥锁、条件变量、读写锁 *互斥锁提供了以排他方式防止数据结构被并发修改的方法。
+            *读写锁允许多个线程同时读共享数据,而对写操作是互斥的。 *条件变量可以以原子的方式阻塞进程,直到某个特定条件为真为止。对条件的测试是在互斥锁
+            的保护下进行的。条件变量始终与互斥锁一起使用。
+            # 信号量机制(Semaphore):包括无名线程信号量和命名线程信号量 # 信号机制(Signal):类似进程间的信号处理
+            线程间的通信目的主要是用于线程同步,所以线程没有像进程通信中的用于数据交换的通信机
+            制。
+        </answer>
+    </item>
+
+    <item>
+        <question>13、多线程间通信和多进程之间通信有什么不同，分别怎么实现？
+            （2016.01.24）
+        </question>
+        <answer>一、进程间的通信方式
+            # 管道( pipe )：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的
+            进程间使用。进程的亲缘关系通常是指父子进程关系。
+            # 有名管道 (namedpipe) ： 有名管道也是半双工的通信方式，但是它允许无亲缘关系进程间的
+            通信。
+            # 信号量(semophore ) ： 信号量是一个计数器，可以用来控制多个进程对共享资源的访问。它
+            常作为一种锁机制，防止某进程正在访问共享资源时，其他进程也访问该资源。因此，主要作为进
+            程间以及同一进程内不同线程之间的同步手段。
+            # 消息队列( messagequeue ) ： 消息队列是由消息的链表，存放在内核中并由消息队列标识符
+            标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。
+            # 信号 (sinal ) ： 信号是一种比较复杂的通信方式，用于通知接收进程某个事件已经发生。
+            # 共享内存(shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内
+            存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间
+            通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号两，配合使用，来实现进程间
+            的同步和通信。
+            # 套接字(socket ) ： 套解口也是一种进程间通信机制，与其他通信机制不同的是，它可用于不同
+            及其间的进程通信。
+            二、线程间的通信方式
+            # 锁机制：包括互斥锁、条件变量、读写锁
+            *互斥锁提供了以排他方式防止数据结构被并发修改的方法。
+            *读写锁允许多个线程同时读共享数据，而对写操作是互斥的。
+            *条件变量可以以原子的方式阻塞进程，直到某个特定条件为真为止。对条件的测试是在互斥锁
+            的保护下进行的。条件变量始终与互斥锁一起使用。
+            # 信号量机制(Semaphore)：包括无名线程信号量和命名线程信号量
+            # 信号机制(Signal)：类似进程间的信号处理
+            线程间的通信目的主要是用于线程同步，所以线程没有像进程通信中的用于数据交换的通信机
+            制。
+        </answer>
+    </item>
+    <item>
+        <question>二、 Android 屏幕适配:1、屏幕适配方式都有哪些?</question>
+        <answer>1.1 适配方式之 dp
+            名词解释：
+            分辨率：eg：480*800,1280*720。表示物理屏幕区域内像素点的总和。(切记：跟屏幕适配没有
+            任何关系)
+            因为我们既可以把 1280*720 的分辨率做到 4.0 的手机上面。我也可以把 1280*720 的分辨率做
+            到 5.0 英寸的手机上面，如果分辨率相同，手机屏幕越小清晰。
+            px(pix)：像素，就是屏幕中最小的一个显示单元
+            dpi（像素密度）：即每英寸屏幕所拥有的像素数，像素密度越大，显示画面细节就越丰富。
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            68
+            计算公式：像素密度=√{（长度像素数^2+宽度像素数^2）}/ 屏幕尺寸
+            注：屏幕尺寸单位为英寸 例：分辨率为 1280*720 屏幕宽度为 6 英寸 计算所得像素密度约等
+            于 245，屏幕尺寸指屏幕对角线的长度。
+            在 Android 手机中 dpi 分类：
+            ldpi Resources for low-density (ldpi) screens (~120dpi).
+            mdpi Resources for medium-density (mdpi) screens (~160dpi). (This is the baseline
+            density.)
+            hdpi Resources for high-density (hdpi) screens (~240dpi).
+            xhdpi Resources for extra high-density (xhdpi) screens (~320dpi).
+            在我们的 Android 工程目录中有如下 drawable-*dpi 目录，这些目录是用来适配不同分辨率手机的。
+            Android 应用在查找图片资源时会根据其分辨率自动从不同的文件目录下查找（这本身就是
+            Android 系统的适配策略），如果在低分辨的文件目录中比如 drawable-mdpi 中没有图片资源，其
+            他目录中都有，当我们将该应用部署到 mdpi 分辨率的手机上时，那么该应用会查找分辨率较高目录
+            下的资源文件，如果较高分辨率目录下也没有资源则只好找较低目录中的资源了。
+            常见手机屏幕像素及对应分别率级别：
+            ldpi 320*240
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            69
+            mdpi 480*320
+            hdpi 800*480
+            xhdpi 1280*720
+            xxhdpi 1920*1080
+            dp 和 px 之间的简单换算关系：
+            ldpi 的手机 1dp=0.75px
+            mdpi 的手机 1dp=1.0px
+            hdpi 的手机 1dp=1.5px
+            xhdpi 的手机 1dp=2.0px
+            xxhdpi 的手机 1dp=3.0px
+            ：根据上面的描述我们得出如下结论，对于 mdpi 的手机，我们的布局通过 dp 单位可以达到适
+            配效果。
+        </answer>
+    </item>
+
+    <item>
+        <question>二、Android 屏幕适配</question>
+        <answer>屏幕适配方式都有哪些
+            1.1 适配方式之 dp
+            名词解释：
+            分辨率：eg：480*800,1280*720。表示物理屏幕区域内像素点的总和。(切记：跟屏幕适配没有
+            任何关系)
+            因为我们既可以把 1280*720 的分辨率做到 4.0 的手机上面。我也可以把 1280*720 的分辨率做
+            到 5.0 英寸的手机上面，如果分辨率相同，手机屏幕越小清晰。
+            px(pix)：像素，就是屏幕中最小的一个显示单元
+            dpi（像素密度）：即每英寸屏幕所拥有的像素数，像素密度越大，显示画面细节就越丰富。
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            68
+            计算公式：像素密度=√{（长度像素数^2+宽度像素数^2）}/ 屏幕尺寸
+            注：屏幕尺寸单位为英寸 例：分辨率为 1280*720 屏幕宽度为 6 英寸 计算所得像素密度约等
+            于 245，屏幕尺寸指屏幕对角线的长度。
+            在 Android 手机中 dpi 分类：
+            ldpi Resources for low-density ( ldpi ) screens (~120dpi).
+            mdpi Resources for medium-density ( mdpi ) screens (~160dpi). (This is the baseline
+            density.)
+            hdpi Resources for high-density ( hdpi ) screens (~240dpi).
+            xhdpi Resources for extra high-density ( xhdpi ) screens (~320dpi).
+            在我们的 Android 工程目录中有如下 drawable-*dpi 目录，这些目录是用来适配不同分辨率手机的。
+            Android 应用在查找图片资源时会根据其分辨率自动从不同的文件目录下查找（这本身就是
+            Android 系统的适配策略），如果在低分辨的文件目录中比如 drawable-mdpi 中没有图片资源，其
+            他目录中都有，当我们将该应用部署到 mdpi 分辨率的手机上时，那么该应用会查找分辨率较高目录
+            下的资源文件，如果较高分辨率目录下也没有资源则只好找较低目录中的资源了。
+            常见手机屏幕像素及对应分别率级别：
+            ldpi 320*240
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            69
+            mdpi 480*320
+            hdpi 800*480
+            xhdpi 1280*720
+            xxhdpi 1920*1080
+            dp 和 px 之间的简单换算关系：
+            ldpi 的手机 1dp=0.75px
+            mdpi 的手机 1dp=1.0px
+            hdpi 的手机 1dp=1.5px
+            xhdpi 的手机 1dp=2.0px
+            xxhdpi 的手机 1dp=3.0px
+            ： 根据上面的描述我们得出如下结论，对于 mdpi 的手机，我们的布局通过 dp 单位可以达到适
+            配效果。
+        </answer>
+    </item>
+    <item>
+        <question>适配方式之 dimens</question>
+        <answer>
+            跟 drawable 目录类似的，在 Android 工程的 res 目录下有 values 目录，这个是默认的目录，同时
+            为了适配不同尺寸手机我们可以创建一个 values-1280x720 的文件夹，同时将 dimens.xml 文件拷
+            贝到该目录下。
+            在 dimens.xml 中定义一个尺寸，如下图所示。
+            在 values-1280x720 目录中的 dimens.xml 中定义同样的尺寸名称，但是使用不同的尺寸，如下图
+            所示。
+            当我们在布局文件中使用长或者宽度单位时，比如下图所示，应该使用@dimen/width 来灵活的定
+            义宽度。
+            ：在 values-1280x720 中，中间的是大写字母 X 的小写形式 x，而不是加减乘除的乘号。如果
+            我们在 values-1280x720 中放置了 dimens 常量，一定记得也将该常量的对应值在 values 目录下的
+            dimens.xml 中放一份，因为该文件是默认配置，当用户的手机不是 1280*720 的情况下系统应用使
+            用的是默认 values 目录中的 dimens.xml。
+        </answer>
+    </item>
+    <item>
+        <question>1.3 适配方式之 layout</question>
+        <answer>跟 values 一样，在 Android 工程目录中 layout 目录也支持类似 values 目录一样的适配，在
+            layout 中我们可以针对不同手机的分辨率制定不同的布局，如下图所示。
+        </answer>
+    </item>
+
+    <item>
+        <question>1.4 适配方式之 java 代码适配</question>
+        <answer>为了演示用 java 代码控制适配的效果，因此假设有这样的需求，让一个 TextView 控件的宽和高
+            分别为屏幕的宽和高的一半。
+        </answer>
+    </item>
+
+    <item>
+        <question>1.5 适配方式之 weight 权重适配</question>
+        <answer>在控件中使用属性 android:layout_weight="1"可以起到适配效果，但是该属性的使用有如下规则：
+            只能用在线性控件中，比如 LinearLayout。
+            竖直方向上使用权重的控件高度必须为 0dp（Google 官方的推荐用法）
+            水平方向上使用权重的控件宽度必须为 0dp（Google 官方的推荐用法）
+        </answer>
+    </item>
+
+    <item>
+        <question>2、屏幕适配的处理技巧都有哪些</question>
+        <answer>手机自适应主要分为两种情况：横屏和竖屏的切换，以及分辨率大小的不同。</answer>
+    </item>
+
+    <item>
+        <question>2.1 横屏和竖屏的切换</question>
+        <answer>1、Android 应用程序支持横竖屏幕的切换，Android 中每次屏幕的切换动会重启 Activity，所
+            以应该在Activity销毁（执行onPause()方法和onDestroy()方法）前保存当前活动的状态；在Activity
+            再次创建的时候载入配置，那样，进行中的游戏就不会自动重启了！有的程序适合从竖屏切换到横屏，
+            或 者 反 过 来 ， 这 个 时 候 怎 么 办 呢 ？ 可 以 在 配 置 Activity 的 地 方 进 行 如 下 的 配 置
+            android:screenOrientation="portrait"（landscape 是横向，portrait 是纵向）。这样就可以保证
+            是竖屏总是竖屏了。
+            2、而有的程序是适合横竖屏切换的。如何处理呢？首先要在配置 Activity 的时候进行如下的配
+            置：
+            android:configChanges="keyboardHidden|orientation" ， 另 外 需 要 重 写 Activity 的
+            onConfigurationChanged 方法。实现方式如下：
+        </answer>
+    </item>
+
+    <item>
+        <question>2.2 分辨率大小不同</question>
+        <answer>对于分辨率问题，官方给的解决办法是创建不同的 layout 文件夹，这就需要对每种分辨率的手
+            机都要写一个布局文件，虽然看似解决了分辨率的问题，但是如果其中一处或多处有修改了，就要每
+            个布局文件都要做出修改，这样就造成很大的麻烦。那么可以通过以下几种方式解决：
+            一）使用 layout_weight
+            目前最为推荐的 Android 多屏幕自适应解决方案。
+            该属性的作用是决定控件在其父布局中的显示权重，一般用于线性布局中。其值越小，则对
+            应的 layout_width 或 layout_height 的优先级就越高（一般到 100 作用就不太明显了）；一般横向
+            布局中，决定的是 layout_width 的优先级；纵向布局中，决定的是 layout_height 的优先级。
+            传统的 layout_weight 使用方法是将当前控件的 layout_width 和 layout_height 都设置成
+            fill_parent,这样就可以把控件的显示比例完全交给 layout_weight；这样使用的话，就出现了
+            layout_weight 越小，显示比例越大的情况（即权重越大，显示所占的效果越小）。不过对于 2 个控
+            件还好，如果控件过多，且显示比例也不相同的时候，控制起来就比较麻烦了，毕竟反比不是那么好
+            确定的。于是就有了现在最为流行的 0px 设值法。看似让人难以理解的 layout_height=0px 的写法，
+            结合 layout_weight，却可以使控件成正比例显示，轻松解决了当前 Android 开发最为头疼的碎片
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            75
+            化问题之一。
+            二）清单文件配置：【不建议使用这种方式，需要对不同的界面写不同的布局】
+            需要在 AndroidManifest.xml 文件的<manifest>元素如下添加子元素
+            以上是为我们的屏幕设置多分辨率支持（更准确的说是适配大、中、小三种密度）。
+            Android:anyDensity="true"，这一句对整个的屏幕都起着十分重要的作用，值为 true，我们的
+            应用程序当安装在不同密度的手机上时，程序会分别加载 hdpi,mdpi,ldpi 文件夹中的资源。相反，
+            如果值设置为 false，即使我们在 hdpi,mdpi,ldpi，xdpi 文件夹下拥有同一种资源，那么应用也不会
+            自动地去相应文件夹下寻找资源。而是会在大密度和小密度手机上加载中密度 mdpi 文件中的资源。
+            有时候会根据需要在代码中动态地设置某个值，可以在代码中为这几种密度分别设置偏移量,但是
+            这种方法最好不要使用，最好的方式是在 xml 文件中不同密度的手机进行分别设置。这里地图的偏
+            移量可以在 values-xpdi，values-hpdi,values-mdpi,values-ldpi 四种文件夹中的 dimens.xml 文件
+            进行设置。
+            三）、其他：
+            说明：
+            在不同分辨率的手机模拟器下，控件显示的位置会稍有不同
+            通过在 layout 中定义的布局设置的参数，使用 dp（dip），会根据不同的屏幕分辨率进行适
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            76
+            配
+            但是在代码中的各个参数值，都是使用的像素（px）为单位的
+            技巧：
+            1、尽量使用线性布局，相对布局，如果屏幕放不下了，可以使用 ScrollView（可以上下拖动）
+            ScrowView 使用的注意：
+            在不同的屏幕上显示内容不同的情况，其实这个问题我们往往是用滚动视图来解决的，也就是
+            ScrowView；需要注意的是 ScrowView 中使用 layout_weight 是无效的，既然使用 ScrowView 了，
+            就把它里面的控件的大小都设成固定的吧。
+            2、指定宽高的时候，采用 dip 的单位，dp 单位动态匹配
+            3、由于 android 代码中写的单位都是像素，所有需要通过工具类进行转化
+            4、尽量使用 9-patch 图，可以自动的依据图片上面显示的内容被拉伸和收缩。其中在编辑的时
+            候，灰色区域是被拉伸的，上下两个点控制水平方向的拉伸，左右两点控制垂直方向的拉伸
+        </answer>
+    </item>
+    <item>
+        <question>dp 和 px 之间的关系</question>
+        <answer>dp：是 dip 的简写，指密度无关的像素。
+            指一个抽象意义上的像素，程序用它来定义界面元素。一个与密度无关的，在逻辑尺寸上，
+            与一个位于像素密度为 160dpi 的屏幕上的像素是一致的。要把密度无关像素转换为屏幕像素，可以
+            用这样一个简单的公式：pixels=dips*(density/160)。举个例子，在 DPI 为 240 的屏幕上，1 个 DIP
+            等于 1.5 个物理像素。
+            布局时最好使用 dp 来定义我们程序的界面，因为这样可以保证我们的 UI 在各种分辨率的屏幕上
+            都可以正常显示。
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            77
+            /**
+            * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+            */
+            public static int px2dip(Context context, float pxValue) {
+            final float scale = context.getResources().getDisplayMetrics().density;
+            return (int) (pxValue / scale + 0.5f);
+            }
+            /**
+            * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
+            */
+            public static int dip2px(Context context, float dpValue) {
+            final float scale = context.getResources().getDisplayMetrics().density;
+            return (int) (dpValue * scale + 0.5f);
+            }
+        </answer>
+    </item>
+    <item>
+        <question>4、Android 中如何捕获未捕获的异常</question>
+        <answer>(一)UncaughtExceptionHandler
+            1、自 定 义 一 个 Application , 比 如 叫 MyApplication 继 承 Application 实 现
+            UncaughtExceptionHandler。
+            2、覆写 UncaughtExceptionHandler 的 onCreate 和 uncaughtException 方法。
+
+            @Override
+            public void onCreate() {
+            super.onCreate(); Thread.setDefaultUncaughtExceptionHandler(this);
+            }
+            @Override
+            public void uncaughtException(final Thread thread, final Throwable ex) { new Thread(new
+            Runnable() {
+            @Override
+            public void run() {
+            Looper.prepare();
+            System.out.println(Thread.currentThread()); Toast.makeText(getApplicationContext(),
+            "thread="+thread.getId()+"
+            ex="+ex.toString(), 1).show(); Looper.loop();
+            }
+            }).start();
+            SystemClock.sleep(3000);
+            android.os.Process.killProcess(android.os.Process.myPid()); }
+            }
+            在 onCreate 方法中我们给 Thread 类设置默认异常处理 handler,如果这句代码不执行则一切 都是白搭。
+            在 uncaughtException 方法中我们必须新开辟个线程进行我们异常的收集工作,然后将系统给 杀死。
+            3、在 AndroidManifest 中配置该 Application
+
+            (二)Bug 收集工具 Crashlytics
+
+            Crashlytics 是专门为移动应用开发者提供的保存和分析应用崩溃的工具。国内主要使用的是友 盟做数据统计。
+            Crashlytics 的好处:
+            1.Crashlytics 不会漏掉任何应用崩溃信息。
+            2.Crashlytics 可以象 Bug 管理工具那样,管理这些崩溃日志。
+            3.Crashlytics 可以每天和每周将崩溃信息汇总发到你的邮箱,所有信息一目了然。
+            使用步骤:
+            1.注册需要审核通过才能使用,国内同类产品顶多发个邮箱激活链接; 2.支持 Eclipse、Intellij IDEA 和 Android Studio 等三大 IDE;
+            3.Eclipse 插件是 iOS 主题风格 UI,跟其他 plugin 在一起简直是鹤立鸡群;
+            4.只要登录帐号并选择项目,会自动导入 jar 包并生成一个序列号,然后在 AndroidManifest.xml 和启动 Activity
+            的入口添加初始化代码,可以说是一键式操作,当然要使用除错误统计外的其他功能 还是得自己添加代码;
+            5.不像友盟等国内同类产品,将固定的序列号直接写入 xml 文件,而是动态自动生成的;当然这个存 放序列号的 xml 文件也是不能修改和提交到版本控制系统的;
+            6.后台可以设置邮件提醒,当然这个最好不要开启,Android 开发那数量惊人、千奇百怪的错误信息 你懂的。
+            7.不仅能统计到 UncaughtException 这种未捕获的 Crash 异常信息,只要在 try/catch 代码块的 catch 中添加一行代码就能统计到任何异常;
+            try{ myMethodThatThrows(); }catch(Exception
+            e){ Crashlytics.logException(e); //handle your exception here! }
+            8.相当详细的错误信息,不仅仅是简单的打印 StackTrace 信息;并且能看到最近一次 crash 的机器 可用内存等信息,而不仅仅是简单统计机型和版本号。
+            使用连接:http://blog.csdn.net/smking/article/details/39320695
+        </answer>
+    </item>
+
+    <item>
+                
+        <question>5、 ANR 是什么?怎样避免和解决 ANR(重要)
+        </question>
+                
+        <answer>在 Android 上,如果你的应用程序有一段时间响应不够灵敏,系统会向用户显示一个对话框, 这个对话框称作应用程序无响应(ANR:Application Not
+            Responding)对话框。用户可以选择让 程序继续运行,但是,他们在使用你的应用程序时,并不希望每次都要处理这个对话框。因此,在程
+            序里对响应性能的设计很重要,这样,系统不会显示 ANR 给用户。
+            Activity 5 秒 broadcast10 秒
+            耗时的操作 worker thread 里面完成, handler message...AsynTask , intentservice.等...
+            ANR:Application Not Responding,即应用无响应
+            ANR 一般有三种类型:
+            1:KeyDispatchTimeout(5 seconds) --主要类型
+            按键或触摸事件在特定时间内无响应
+            2:BroadcastTimeout(10 seconds)
+            BroadcastReceiver 在特定时间内无法处理完成
+
+            3:ServiceTimeout(20 seconds) --小概率类型
+            Service 在特定的时间内无法处理完成
+            超时的原因一般有两种:
+            (1)当前的事件没有机会得到处理(UI 线程正在处理前一个事件没有及时完成或者 looper 被某种原 因阻塞住)
+            (2)当前的事件正在处理,但没有及时完成
+            UI 线程尽量只做跟 UI 相关的工作,耗时的工作(数据库操作,I/O,连接网络或者其他可能阻碍 UI 线程的操作)放入单独的线程处理,尽量用 Handler 来处理 UI
+            thread 和 thread 之间的交互。
+            UI 线程主要包括如下:
+            Activity:onCreate(), onResume(), onDestroy(), onKeyDown(), onClick() AsyncTask:
+            onPreExecute(), onProgressUpdate(), onPostExecute(), onCancel() Mainthread handler:
+            handleMessage(), post(runnable r)
+            查找 ANR 的方式: 1. 导出/data/data/anr/traces.txt,找出函数和调用过程,分析代码 2. 通过 性能 LOG 人肉查找
+        </answer>
+            
+    </item>
+
+    <item>
+                
+        <question>6、Android 线程间通信有哪几种方式(重要)</question>
+                
+        <answer>Ø 共享内存(变量); Ø 文件,数据库;
+            Ø Handler;
+            Ø Java 里的 wait(),notify(),notifyAll()
+        </answer>
+            
+    </item>
+
+    <item>
+        <question>1、
+            Fragment 跟Activity
+            之间是如何传值的
+        </question>
+        <answer>当Fragment 跟Activity
+            绑定之后，
+            在Fragment 中可以直接通过getActivity
+            （）
+            方法获取到其绑定的Activity 对象
+            ，
+            这样就可以调用Activity 的方法了
+            。
+            在Activity 中可以通过如下方法获取到Fragment
+            实例获取到Fragment 之后就可以调用Fragment
+            的方法。也就实现了通信功能。
+        </answer>
+    </item>
+    <item>
+        <question>2、描述一下 Fragment 的生命周期</question>
+        <answer></answer>
+    </item>
+    <item>
+        <question>3、Fragment 的 replace 和 add 方法的区别</question>
+        <answer>Fragment 本身并没有 replace 和 add 方法,这里的理解应该为使用 FragmentManager 的 replace
+            和 add 两种方法切换 Fragment 时有什么不同。
+            我们经常使用的一个架构就是通过 RadioGroup 切换 Fragment,每个 Fragment 就是一个功能模块。
+            实现这个功能可以通过 replace 和 add 两种方法。
+            Fragment 的容器一个 FrameLayout,add 的时候是把所有的 Fragment 一层一层的叠加到了
+            FrameLayout 上了,而 replace 的话首先将该容器中的其他 Fragment 去除掉然后将当前 Fragment
+            添加到容器中。
+            一个 Fragment 容器中只能添加一个 Fragment 种类,如果多次添加则会报异常,导致程序终止,
+            而 replace 则无所谓,随便切换。
+            因为通过 add 的方法添加的 Fragment,每个 Fragment 只能添加一次,因此如果要想达到切换效
+            果需要通过 Fragment 的的 hide 和 show 方法结合者使用。将要显示的 show 出来,将其他 hide
+            起来。这个过程 Fragment 的生命周期没有变化。
+            通过 replace 切换 Fragment,每次都会执行上一个 Fragment 的 onDestroyView,新 Fragment
+            的 onCreateView、onStart、onResume 方法。
+            基于以上不同的特点我们在使用的使用一定要结合着生命周期操作我们的视图和数据。
+        </answer>
+    </item>
+
+    <item>
+        <question>4、Fragment 如何实现类似 Activity 栈的压栈和出栈效果的?</question>
+        <answer>Fragment 的事物管理器内部维持了一个双向链表结构,该结构可以记录我们每次 add 的 Fragment 和 replace 的 Fragment,然后当我们点击
+            back 按钮的时候会自动帮我们实现退栈操作。
+            Add this transaction to the back stack. This means that the transaction will be
+            remembered after it is committed, and will reverse its operation when later popped off
+            the stack.
+            Parameters:
+            name An optional name for this back stack state, or null.
+            transaction.addToBackStack("name");
+            //实现源码 在 BackStackRecord 中
+            public FragmentTransaction addToBackStack(String name) {
+            if (!mAllowAddToBackStack) {
+            throw new IllegalStateException(
+            "This FragmentTransaction is not allowed to be added to the back
+            stack."); }
+            mAddToBackStack = true; mName = name;
+            return this;
+            } //上面的源码仅仅做了一个标记
+            除此之外因为我们要使用 FragmentManger 用的是 FragmentActivity,因此 FragmentActivity 的 onBackPress
+            方法必定重新覆写了。打开看一下,发现确实如此。
+
+            * Take care of popping the fragment back stack or finishing the activity
+            * as appropriate.
+            */
+            public void onBackPressed() {
+            if (!mFragments.popBackStackImmediate()) {
+            finish(); }
+            }
+            //mFragments 的原型是 FragmentManagerImpl,看看这个方法都干嘛了
+            @Override
+            public boolean popBackStackImmediate() {
+            checkStateLoss();
+            executePendingTransactions();
+            return popBackStackState(mActivity.mHandler, null, -1, 0); }
+            //看看 popBackStackState 方法都干了啥,其实通过名称也能大概了解 只给几个片段吧,代码太多 了
+            while (index >= 0) { //从后退栈中取出当前记录对象
+            BackStackRecord bss = mBackStack.get(index);
+            if (name != null && name.equals(bss.getName())) {
+            break; }
+            if (id >= 0 && id == bss.mIndex) { break;
+            }
+            index--; }
+        </answer>
+
+    </item>
+    <item>
+        <question>5、Fragment 在你们项目中的使用</question>
+        <answer>Fragment 是 android3.0 以后引入的的概念,做局部内容更新更方便,原来为了到达这一点要
+            把多个布局放到一个 activity 里面,现在可以用多 Fragment 来代替,只有在需要的时候才加载
+            Fragment,提高性能。
+            Fragment 的好处:
+            (1)Fragment 可以使你能够将 activity 分离成多个可重用的组件,每个都有它自己的生命周期和 UI。
+            (2)Fragment 可以轻松得创建动态灵活的 UI 设计,可以适应于不同的屏幕尺寸。从手机到平板电 脑。
+            (3)Fragment 是一个独立的模块,紧紧地与 activity 绑定在一起。可以运行中动态地移除、加入、 交换等。
+            (4)Fragment 提供一个新的方式让你在不同的安卓设备上统一你的 UI。
+            (5)Fragment 解决 Activity 间的切换不流畅,轻量切换。
+            (6)Fragment 替代 TabActivity 做导航,性能更好。
+            (7)Fragment 在 4.2.版本中新增嵌套 fragment 使用方法,能够生成更好的界面效果。
+            6、如何切换 fragement,不重新实例化
+            翻看了 Android 官方 Doc,和一些组件的源代码,发现 replace()这个方法只是在上一个 Fragment 不再需要时采用的简便方法.
+            正确的切换方式是 add(),切换时 hide(),add()另一个 Fragment;再次切换时,只需 hide()当前, show()另一个。
+            这样就能做到多个 Fragment 切换不重新实例化:
+            public void switchContent(Fragment from, Fragment to) { if (mContent != to) {
+            mContent = to;
+            FragmentTransaction transaction
+            =mFragmentMan.beginTransaction().setCustomAnimations(android.R.anim.fad e_in,
+            R.anim.slide_out);
+            if (!to.isAdded()) { // 先判断是否被 add 过 transaction.hide(from).add(R.id.content_frame,
+            to).commit(); // 隐藏
+            当前的 fragment,add 下一个到 Activity 中 } else {
+            transaction.hide(from).show(to).commit(); // 隐藏当前的 fragment,显示下一个
+            } }
+            }
+        </answer>
+    </item>
+    <item>
+        <question>6.如何切换fragement,不重新实例化</question>
+        <answer>翻看了 Android 官方 Doc,和一些组件的源代码,发现 replace()这个方法只是在上一个 Fragment
+            不再需要时采用的简便方法.
+            正确的切换方式是 add(),切换时 hide(),add()另一个 Fragment;再次切换时,只需 hide()当前,
+            show()另一个。
+            这样就能做到多个 Fragment 切换不重新实例化:
+        </answer>
+    </item>
+
+
+    <item>
+        <question>1、如何对 Android 应用进行性能分析</question>
+        <answer>一款 App 流畅与否安装在自己的真机里,玩几天就能有个大概的感性认识。不过通过专业的分析工 具可以使我们更好的分析我们的应用。而在实际开发中,我们解决完当前应用所有
+            bug 后,就会开 始考虑到新能的优化。
+            如果不考虑使用其他第三方性能分析工具的话,我们可以直接使用 ddms 中的工具,其实 ddms 工 具已经非常的强大了。ddms 中有
+            traceview、heap、allocation tracker 等工具都可以帮助我们分 析应用的方法执行时间效率和内存使用情况。
+            traceview
+            (一)TraceView 简介
+            Traceview 是 Android 平台特有的数据采集和分析工具,它主要用于分析 Android 中应用程
+            序的 hotspot(瓶颈)。Traceview 本身只是一个数据分析工具,而数据的采集则需要使用 Android SDK 中的 Debug 类或者利用 DDMS 工具。
+            二者的用法如下:
+            开发者在一些关键代码段开始前调用 Android SDK 中 Debug 类的 startMethodTracing 函数,并 在关键代码段结束前调用
+            stopMethodTracing 函数。这两个函数运行过程中将采集运行时间内该应 用所有线程(注意,只能是 Java
+            线程)的函数执行情况,并将采集数据保存到/mnt/sdcard/下的一 个文件中。开发者然后需要利用 SDK 中的 Traceview 工具来分析这些数据。
+            借助 Android SDK 中的 DDMS 工具。DDMS 可采集系统中某个正在运行的进程的函数调用信息。
+            对开发者而言,此方法适用于没有目标应用源代码的情况。DDMS 工具中 Traceview 的使用如下图
+
+            点击上图中所示按钮即可以采集目标进程的数据。当停止采集时,DDMS 会自动触发 Traceview 工具来浏览采集数据。
+            下面,我们通过一个示例程序介绍 Traceview 的使用。 实例程序如下图所示:界面有 4 个按钮,对应四个方法。
+            点击不同的方法会进行不同的耗时操作。
+            我们分别点击按钮一次,要求找出最耗时的方法。点击前通过 DDMS 启动 Start Method Profiling 按钮。
+            然后依次点击 4 个按钮,都执行后再次点击上图中红框中按钮,停止收集数据。 接下来我们开始对数据进行分析。
+            当我们停止收集数据的时候会出现如下分析图表。该图表分为 2 大部分,上面分不同的行,每一 行代表一个线程的执行耗时情况。main
+            线程对应行的的内容非常丰富,而其他线程在这段时间内干 得工作则要少得多。图表的下半部分是具体的每个方法执行的时间情况。显示方法执行情况的前提是 先选中某个线程。
+            我们主要是分析 main 线程。 上面方法指标参数所代表的意思如下:
+            列名
+            描述
+
+            Name
+            该线程运行过程中所调用的函数名
+            Incl Cpu Time
+            某函数占用的 CPU 时间,包含内部调用其它函数的 CPU 时间
+            Excl Cpu Time
+            某函数占用的 CPU 时间,但不含内部调用其它函数所占用的 CPU 时间
+            Incl Real Time
+            某函数运行的真实时间(以毫秒为单位),内含调用其它函数所占用的真实时间
+            Excl Real Time
+            某函数运行的真实时间(以毫秒为单位),不含调用其它函数所占用的真实时间
+            Call+Recur Calls/Total
+            某函数被调用次数以及递归调用占总调用次数的百分比
+            Cpu Time/Call
+            某函数调用 CPU 时间与调用次数的比。相当于该函数平均执行时间
+            Real Time/Call
+            同 CPU Time/Call 类似,只不过统计单位换成了真实时间
+            我们为了找到最耗时的操作,那么可以通过点击 Incl Cpu Time,让其按照时间的倒序排列。我 点击后效果如下图:
+            通过分析发现:method1 最耗时,耗时 2338 毫秒。
+            那么有了上面的信息我们可以进入我们的 method1 方法查看分析我们的代码了。
+            heap
+            (二)heap 简介
+            heap 工具可以帮助我们检查代码中是否存在会造成内存泄漏的地方。 用 heap 监测应用进程使用内存情况的步骤如下:
+            1.启动 eclipse 后,切换到 DDMS 透视图,并确认 Devices 视图、Heap 视图都是打开的; 2.点击选中想要监测的进程,比如 system_process
+            进程;
+            3.点击选中 Devices 视图界面中最上方一排图标中的“Update Heap”图标;
+            4.点击 Heap 视图中的“Cause GC”按钮;
+            5.此时在 Heap 视图中就会看到当前选中的进程的内存使用量的详细情况。 说明:
+            a. 点击“Cause GC”按钮相当于向虚拟机请求了一次 gc 操作;
+            b. 当内存使用信息第一次显示以后,无须再不断的点击“Cause GC”,Heap 视图界面会定时
+            刷新,在对应用的不断的操作过程中就可以看到内存使用的变化;
+            c. 内存使用信息的各项参数根据名称即可知道其意思,在此不再赘述。
+            如何才能知道我们的程序是否有内存泄漏的可能性呢?
+            Ø 这里需要注意一个值:Heap 视图中部有一个 Type 叫做 data object,即数据对象,也就是我们
+            的程序中大量存在的类类型的对象。在 data object 一行中有一列是“Total Size”,其值就是 当前进程中所有 Java
+            数据对象的内存总量,一般情况下,这个值的大小决定了是否会有内存泄 漏。可以这样判断:
+            Ø 不断的操作当前应用,同时注意观察 data object 的 Total Size 值;
+            Ø 正常情况下TotalSize值都会稳定在一个有限的范围内,也就是说由于程序中的的代码良好,
+            没有造成对象不被垃圾回收的情况,所以说虽然我们不断的操作会不断的生成很多对象,而在虚 拟机不断的进行 GC 的过程中,这些对象都被回收了,内存占用量会会落到一个稳定的水平;
+            47
+            Ø 反之如果代码中存在没有释放对象引用的情况,则 data object 的 Total Size 值在每次 GC 后不 会有明显的回落,随着操作次数的增多 Total
+            Size 的值会越来越大,直到到达一个上限后导致进 程被 kill 掉。
+            Ø 此处以system_process进程为例,在我的测试环境中system_process进程所占用的内存的 data object 的 Total Size
+            正常情况下会稳定在 2.2~2.8 之间,而当其值超过 3.55 后进程就会被 kill。
+            总之,使用 DDMS 的 Heap 视图工具可以很方便的确认我们的程序是否存在内存泄漏的可能性。
+            allocation tracker
+            (三)allocation tracker 简介
+            allocation tracker 是内存分配跟踪工具
+            步骤:
+            运行 DDMS,只需简单的选择应用进程并单击 Allocation tracker 标签,就会打开一个新的窗口, 单击“Start Tracing”按钮;
+            然后,让应用运行你想分析的代码。运行完毕后,单击“Get Allocations”按钮,一个已分配对象 的列表就会出现第一个表格中。
+            单击第一个表格中的任何一项,在表格二中就会出现导致该内存分配的栈跟踪信息。通过 allocation
+            tracker,不仅知道分配了哪类对象,还可以知道在哪个线程、哪个类、哪个文件的哪一行。
+        </answer>
+    </item>
+    <item>
+        <question>2、什么情况下会导致内存泄露
+        </question>
+        <answer>Android 的虚拟机是基于寄存器的 Dalvik,它的最大堆大小一般是 16M,有的机器为 24M。因
+            此我们所能利用的内存空间是有限的。如果我们的内存占用超过了一定的水平就会出现
+            内存溢出的几点原因:
+            1. 资源释放问题
+            程序代码的问题,长期保持某些资源,如 Context、Cursor、IO 流的引用,资源得不到释放 造成内存泄露。
+            2. 对象内存过大问题
+            保存了多个耗用内存过大的对象(如 Bitmap、XML 文件),造成内存超出限制。
+        </answer>
+    </item>
+    <item>
+        <question>3. static关键字的使用问题</question>
+        <answer>static 是 Java 中的一个关键字,当用它来修饰成员变量时,那么该变量就属于该类,而不是 该类的实例。所以用 static
+            修饰的变量,它的生命周期是很长的,如果用它来引用一些资源耗费 过多的实例(Context 的情况最多),这时就要谨慎对待了
+            以上的代码是很危险的,如果将 Activity 赋值到 mContext 的话。那么即使该 Activity 已经 onDestroy,但是由于仍有对象保存它的引用,因此该
+            Activity 依然不会被释放。
+            我们举 Android 文档中的一个例子。
+            sBackground 是一个静态的变量,但是我们发现,我们并没有显式的保存 Contex 的引用, 但是,当 Drawable 与 View 连接之后,Drawable 就将
+            View 设置为一个回调,由于 View 中是 包含 Context 的引用的,所以,实际上我们依然保存了 Context 的引用。所以,最终该 Context
+            也没有得到释放,发生了内存泄露。
+            针对 static 的解决方案
+            1) 应该尽量避免 static 成员变量引用资源耗费过多的实例,比如 Context。
+            2) Context尽量使用ApplicationContext,因为Application的Context的生命周期比较
+            长,引用它不会出现内存泄露的问题。
+            3) 使 用 WeakReference 代 替 强 引 用 。 比 如 可 以 使 用 WeakReference（Context） mContextRef;
+        </answer>
+    </item>
+
+    <item>
+        <question>1、什么是AIDL以及如何使用</question>
+        <answer>①aidl是AndroidinterfacedefinitionLanguage 的英文缩写，意思Android 接口定义语言。
+            ②使用aidl可以帮助我们发布以及调用远程服务，实现跨进程通信。
+            ③将服务的aidl放到对应的src目录，工程的gen目录会生成相应的接口类我们通过
+            bindService（Intent，ServiceConnect，int）方法绑定远程服务，在 bindService中 有 一 个 ServiceConnec 接 口 ，
+            我 们 需 要 覆 写 该 类
+            的onServiceConnected(ComponentName,IBinder)方法，这个方法的第二个参数IBinder对象其实就是已经在aidl中定义的接口，因此我们可以将IBinder对象强
+            制转换为aidl中的接口类。我们通过IBinder获取到的对象（也就是aidl文件生成的接口）其实是系统产生的代理对象，该代理对象既可以跟我们的进程通信，又可以跟远程进程通信，作为一个中间的角色实现了进程间通信。
+        </answer>
+    </item>
+    <item>
+        <question>AIDL的全称是什么?如何工作?能处理哪些类型的数据？</question>
+        <answer>AIDL全称AndroidInterfaceDefinitionLanguage（AndRoid接口描述语言） 是一种接口描述语言;
+            编译器可以通过aidl文件生成一段代码，通过预先定义的接口达到两个进程内部通信进程跨界对象访问的目的。需要完成2件事情: 1. 引入AIDL的相关类.; 2.
+            调用aidl产生的class.理论上, 参数可以传递基本数据类型和String, 还有就是Bundle的派生类,
+            不过在Eclipse中,目前的ADT不支持Bundle做为参数。
+
+        </answer>
+    </item>
+    <item>
+        <question>、Handler机制</question>
+        <answer>Android中主线程也叫UI线程，那么从名字上我们也知道主线程主要是用来创建、更新UI的，
+            而其他耗时操作，比如网络访问，或者文件处理，多媒体处理等都需要在子线程中操作，之所以在子
+            线程中操作是为了保证UI的流畅程度，手机显示的刷新频率是60Hz，也就是一秒钟刷新60次，每
+            16.67毫秒刷新一次，为了不丢帧，那么主线程处理代码最好不要超过16毫秒。当子线程处理完数
+            据后，为了防止 UI 处理逻辑的混乱，Android只允许主线程修改 UI，那么这时候就需要 Handler
+            来充当子线程和主线程之间的桥梁了。
+            我们通常将Handler声明在Activity 中，然后覆写Handler中的handleMessage方法,当子线
+            程调用handler.sendMessage()方法后handleMessage方法就会在主线程中执行。
+            这里面除了Handler、Message外还有隐藏的Looper和MessageQueue对象。
+            在主线程中Android默认已经调用了Looper.preper()方法，调用该方法的目的是在Looper中
+            创建 MessageQueue 成员变量并把 Looper 对象绑定到当前线程中。当调用 Handler 的
+            sendMessage（对象）方法的时候就将 Message 对象添加到了 Looper 创建的 MessageQueue
+            队列中，同时给Message指定了target对象，其实这个target对象就是Handler对象。主线程默
+            认执行了Looper.looper（）方法，该方法从Looper的成员变量MessageQueue中取出Message，
+            然后调用Message的target对象的handleMessage()方法。这样就完成了整个消息机制
+        </answer>
+    </item>
+    <item>
+        <question>事件分发机制</question>
+        <answer>事件分发中的onTouch和onTouchEvent有什么区别，又该如何使用？
+            这两个方法都是在 View 的 dispatchTouchEvent 中调用的，onTouch 优先于 onTouchEvent
+            执行。如果在onTouch方法中通过返回true将事件消费掉，onTouchEvent将不会再执行。
+            另外需要注意的是，onTouch能够得到执行需要两个前提条件，第一mOnTouchListener的值
+            不能为空，第二当前点击的控件必须是enable的。因此如果你有一个控件是非enable的，那么给
+            它注册onTouch事件将永远得不到执行。对于这一类控件，如果我们想要监听它的touch事件，就
+            必须通过在该控件中重写onTouchEvent方法来实现。
+        </answer>
+    </item>
+    <item>
+        <question>请描述一下Android的事件分发机制</question>
+        <answer>Android 的事件分发机制主要是 Touch 事件分发，有两个主角:ViewGroup 和 View。Activity
+            的Touch事件事实上是调用它内部的ViewGroup的Touch事件，可以直接当成ViewGroup处理。
+            View在ViewGroup内，ViewGroup也可以在其他ViewGroup内，这时候把内部的ViewGroup
+            当成View来分析。
+            先分析ViewGroup的处理流程：首先得有个结构模型概念：ViewGroup和View组成了一棵树
+            形结构，最顶层为Activity 的ViewGroup，下面有若干的ViewGroup节点，每个节点之下又有若
+            干的ViewGroup节点或者View节点，依次类推。如图：Android 的事件分发机制主要是 Touch 事件分发，有两个主角:ViewGroup 和
+            View。Activity
+            的Touch事件事实上是调用它内部的ViewGroup的Touch事件，可以直接当成ViewGroup处理。
+            View在ViewGroup内，ViewGroup也可以在其他ViewGroup内，这时候把内部的ViewGroup
+            当成View来分析。
+            先分析ViewGroup的处理流程：首先得有个结构模型概念：ViewGroup和View组成了一棵树
+            形结构，最顶层为Activity 的ViewGroup，下面有若干的ViewGroup节点，每个节点之下又有若
+            干的ViewGroup节点或者View节点，依次类推。如图：
+        </answer>
+    </item>
+
+    <item>
+        <question>、子线程发消息到主线程进行更新UI，除了handler和AsyncTask， 还有什么？</question>
+        <answer>1、用Activity对象的runOnUiThread方法更新
+            在子线程中通过runOnUiThread()方法更新UI：
+            如果在非上下文类中（Activity），可以通过传递上下文实现调用；
+            2、用View.post(Runnable r)方法更新UI
+        </answer>
+    </item>
+
+    <item>
+        <question>子线程中能不能new handler？为什么？</question>
+        <answer>不能,如果在子线程中直接 new Handler()会抛出异常 java.lang.RuntimeException: Can't
+            create handler inside thread that has not called
+            在没有调用Looper.prepare()的时候不能创建 Handler,因为在创建 Handler 的源码中做了
+            如下操作
+            Handler的构造方法中
+            public static Looper myLooper() {
+            return sThreadLocal.get();
+            }
+            mLooper = Looper.myLooper();
+            if (mLooper == null) {
+            throw new RuntimeException(
+            "Can't create handler inside thread that has not called Looper.prepare()");
+            }
+        </answer>
+    </item>
+
+    <item>
+        <question>
+            Devik 进程,linux 进程,线程的区别
+        </question>
+        <answer>
+            Dalvik 虚拟机运行在 Linux 操作系统之上。Linux 操作系统并没有纯粹的线程概念,只要两个进程
+            共享一个地址空间,那么就可以认为它们是同一个进程的两个线程。Linux 系统提供了两个 fork 和 clone 调用,其中,前者是用来创建进程的,而后者是用来创建线程的。
+            一般来说,虚拟机的进程和线程都是和目标机器本地操作系统的进程和线程一一对应的,这样的好处 是可以使本地操作系统来调度进程和线程。
+            每个 Android 应用程序进程都有一个 Dalvik 虚拟机实例。这样做得好处是 Android 应用程序进程 之间不会互相影响,也就是说,一个 Android
+            应用程序进程的意外终止,不会影响到其他的应用程 序进程的正常运行。
+            每个 Android 应用程序进程都是由一种称为 Zygote 的进程 fork 出来的。Zygote 进程是由 init
+            进程启动起来的,也就是在系统启动的时候启动的。Zygnote 进程在启动的时候,会创建一 个虚拟机实例,并且在这个虚拟机实例将所有的 Java 核心库都加载起来。每当
+            Zygote 进程需 要创建一个 Android 应用程序进程的时候,它就通过复制自身来实现,也就是通过 fork 系统调 用来实现。这些被 fork 出来的 Android
+            应用程序进程,一方面是复制了 Zygote 进程中的虚拟 机实例,另外一方面是与 Zygote 进程共享了同一套 Java 核心库。这样不仅 Android 程序进程
+            的创建很快,而且所有的应用程序都共享同一套 Java 核心库而节省了内存空间。
+        </answer>
+    </item>
+
+    <item>
+        <question>十一、 设计模式六大原则</question>
+        <answer>1.单一职责原则:不要存在多于一个导致类变更的原因。 通俗的说:即一个类只负责一项职责。
+            2.里氏替换原则:所有引用基类的地方必须能透明地使用其子类的对象。 通俗的说:当使用继承时。类 B 继承类 A 时,除添加新的方法完成新增功能 P2
+            外,尽量不要重写父类 A
+            的方法,也尽量不要重载父类 A 的方法。如果子类对这些非抽象方法任意修改,
+            就会对整个继承体系造 成破坏。子类可以扩展父类的功能,但不能改变父类原有的功能。
+            3.依赖倒置原则:高层模块不应该依赖低层模块,二者都应该依赖其抽象;抽象不 应该依赖细节;细节应
+            该依赖抽象。
+            通俗的说:在 java 中,抽象指的是接口或者抽象类,细节就是具体的实现类, 使用接口或者抽象类的目的
+            是制定好规范和契约,而不去涉及任何具体的操作,把展现细节的任务交给他
+            们的实现类去完成。依赖
+            倒置原则的核心思想是面向接口编程. 131
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            4.接口隔离原则:客户端不应该依赖它不需要的接口;一个类对另一个类的依赖应 该建立在最小的接口上。
+            通俗的说:建立单一接口,不要建立庞大臃肿的接口,尽量细化接口,接口中的 方法尽量少。也就是说,
+            我们要为各个类建立专用的接口,而不要试图去建立一个很庞大的接口供所有 依赖它的类去调用。
+            5.迪米特法则:一个对象应该对其他对象保持最少的了解 通俗的说:尽量降低类与类之间的耦合。
+            6.开闭原则:一个软件实体如类、模块和函数应该对扩展开放,对修改关闭。 通俗的说:用抽象构建框架,用实现扩展细节。因为抽象灵活性好,适应性广,
+            只要抽象的合理,可以基本保持软件
+            架构的稳定。而软件中易变的细节,我们用从抽象派生的实现类来进行扩展,
+            当软件需要发生变化时,我们只需要根
+            据需求重新派生一个实现类来扩展就可以了。
+        </answer>
+    </item>
+
+    <item>
+        <question>十三、第三方支付</question>
+        <answer>申请流程
+            注册支付宝账号??进行实名认证??提交审核资料??审核通过
+            备注：申请通过后会获得：合作者身份 ID（PID），该 ID 在项目配置中需要用到
+            开发流程：
+            第一步：
+            下载 API 开发文档后，即可获取官方 Demo，该 Demo 中需要将审核通过后获取的 PID 替换，并且输入支付宝收
+            款账户即可。这里非常简单，就不过多叙述。
+            第二步：
+            官方 Api 开发文档中，存在一个 openssl 的文件夹，该文件夹主要是用于生成支付宝所需要用到的公钥以及私钥。
+            打开该文件夹可以看到详细的生成方式，根据提示生成公钥及私钥，请注意，密钥需要经过 pkcs8 二次加密。
+            第三步：
+            将生成的公钥和私钥配置到 Demo 中。
+            第四步（可省略）：
+
+            为了方便后期维护，建议将支付宝相关的方法及配置项抽取出来做为单独的一个类，后期需要使用直接调用即可。
+        </answer>
+    </item>
+    <item>
+        <question>十四、 常见框架分析</question>
+        <answer>1. Otto 与 EventBus
+            这两个框架的实现原理差不多, 在开发中常用 Otto.
+            我们假设这样一种业务场景，现在在做一款及时聊天应用，我们在聊天页面进行收发信息，同时也要实时更新前
+            一页面的聊天记录，这时我们该如何去实现？可以使用的是广播接收器 BroadCastReceiver，在接收和发送消息的
+            时候就不停去发送广播，然后在需要实时更新的地方进行接收更新。实现的思想比较简单，也不存在代码上的耦合
+            问题，但是有个弊端。弊端就是需要去在很多地方实现 BroadCastRecevier，代码虽不算冗余，但比较多，看起来
+            很是不爽。使用 Otto 能解决代码体积的问题。Otto 是一款目前比较流行事件总线框架，旨在保持应用各页面和模
+            块之间通信高效的前提下，对应用进行解耦。Otto 是基于观察者设计模式，简单来说，如果你想订阅某个消息，
+            使用@Subcribe 注解即可进行接收，同时使用
+            Bus.post(Object obj)进行消息的发布，这样的设计达到了完全的解耦。
+            Otto 使用过程:
+            一、Bus 实例化
+            Bus 这个类是整个框架的灵魂，它负责消息的发布和接收，整个流程都是经过这个 Bus 去实现的。Bus 的实例化推
+            荐使用单例，就是说整个应用内只实例化一个 Bus 对象，所有的消息的处理都是经过这单一的实例去实现。因为要
+            实现消息的接受者接收到发布的消息，一定要经过同一个 Bus 对象的处理。Bus 的构造器可以接收 ThreadEnforcer
+            类型的参数，ThreadEnforcer 其实是一个接口，它自身有两个实现，分别表示 Bus 运行在 Main Thread 中还是异
+            步线程中。二、注册和解绑 Bus
+            根据具体的业务需求进行 Bus 的注册和解绑，对于 android 中的组件，一般是基于生命周期方法中去实现；同时
+            如果是任意你自定义的类中都可以进行。下面展示的是在 Activity 和 Fragment 里面实现。
+            三、消息的发布
+            发布消息是整个框架中最重要的部分，它允许你告诉所有的订阅者一个事件已经触发。任何一个类的实例对象都可
+            以通过总线 Bus 去发布，同时也只能被订阅这种对象的接受者所接收。下面展示的是通过 Bus 去发布一个消息，
+            消息的内容是 LocationChangeEvent，所以 LocationChangeEvent 的接受者都能接收到此发布的消息。注意的
+            是，发布消息只能一个 Object 对象。
+            四、消息的订阅
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            137
+            消息的订阅和发布之前都要在当前的类中进行 Bus 的注册。订阅是对消息发布的补充，当消息发布的事件调用之后，
+            对应的消息订阅者就能立即接收到此消息。实现订阅功能是通过自定义方法实现的，方法的名称可以随意，同时还
+            得需要满足三个条件。
+            1、方法前使用@Subscribe 注解
+            2、访问修饰符为 public
+            3、单一参数，根据你想订阅的消息进行设置
+            注：使用之前，记得进行注册；使用完毕，记得释放。
+            五、消息的 produce
+            当订阅者注册完毕，针对特定的消息，通常也需要获取当前已知的值。这个时候，就需要用到 produce。同样的使
+            用 produce 的方法名称可以随意，同时有三点需要注意。
+            1、方法前使用@produce 注解
+            2、访问修饰符为 public
+            3、无参，返回值是基于订阅者参数类型
+            当然 Otto 的缺点也是有的，要实现上述订阅/发布模型的功能，付出的代价就是对各个注册 Bus 的类进行反射。如
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            138
+            果大量的使用的情况下，对应用的性能多少有点副影响。
+            实现原理:
+            这个框架所实现的功能本质是在一个对象中调用任意的另一个或多个对象中的方法, 而不需要将这个或者这些
+            对象传入调用者.
+            如果把它们都传入调用者去调用它们的方法, 那么调用者就依赖这些对象, 程序的耦合度就高了, 所以说这个框架
+            是用来解耦的.
+            无论 EventBus 还是 Otto 都有一个注册(register)的方法, 方法参数是需要订阅事件的对象.
+            register 方法会拿到参数的 class 文件,
+            Otto 通过反射获取类中有@Subscribe 注解的方法,
+            将该 Method 对象和参数放入 Otto 内部的一个集合中,
+            在发布事件时调用 post 方法, post 方法会根据参数类型, 在这个集合中找到 register 时放入的相对应 Method 对
+            象,
+            调用这个Method所需要的对象是register时传入的参数, 所需的参数是post时传入的参数, 这些都已经有了, 直
+            接将它 invoke
+            EventBus 与 Otto 不同仅在于 Otto 是通过注解来确定哪些方法是需要接收事件的方法, 而 EventBus 是通过固定
+            的方法名来确定的, 所以在项目上线, 代码混淆时, 使用了 EventBus 的类都不能混淆, 因此在项目中使用 Otto 会
+            更多一点.
+        </answer>
+    </item>
+    <item>
+        <question></question>
+        <answer></answer>
+    </item>
+    <item>
+        <question></question>
+        <answer></answer>
+    </item>
+    <item>
+        <question>十二、 第三方登陆</question>
+        <answer>参考资料:http://blog.csdn.net/infsafe/article/details/10209401 132
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            1、你们需要支持用户注册
+            2、你们需要在应用登录的时候提供第三方平台的图标 3、用户点击第三方平台图标以后,你们尝试判断用户是否已经授权 4、如果用户授权,获取他的唯一识别符,比方说 WeiboDb
+            里面的 weiboId 这个字段
+            5、如果用户没有授权,引导用户授权,授权成功后也可以获取 weibo Id
+            133
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            6、然后用这个唯一识别符登录你们的系统,如果用户已经注册,则应该让用户登录到你们的系统, 流程结束
+            7、如果你们的系统发现用户没有注册,引导用户进入你们应用的注册页面,并通过 share sdk 的 showuser
+            方法获取用户资料,自动帮助用户完成注册资料的填写,然后等待用户确认 8、如果用户确认了注册信息,你们的应用就根据他的信息完成这注册操作,如果操作成功,则应该
+            让用户登录到你们的系统,流程结束
+        </answer>
+    </item>
+
+    <item>
+        <question>
+            描述一下 android 的系统架构?
+        </question>
+        <answer>
+            1. android 系统架构分从下往上为 linux 内核层、运行库、应用程序框架层、和应用程序层。
+            2. linuxkernel:负责硬件的驱动程序、网络、电源、系统安全以及内存管理等功能。
+            3. libraries 和 androidruntime:libraries:即 c/c++函数库部分,大多数都是开放源代码的 函数库,例如 webkit,该函数库负责
+            android 网页浏览器的运行,例如标准的 c 函数库 libc、 openssl、sqlite 等,当然也包括支持游戏开发 2dsgl 和
+            3dopengles,在多媒体方面有 mediaframework 框架来支持各种影音和图形文件的播放与显示,例如 mpeg4、h.264、 mp3、 aac、amr、jpg
+            和 png 等众多的多媒体文件格式。android 的 runtime 负责解释和 执行生成的 dalvik 格式的字节码。
+            4. applicationframework(应用软件架构),java 应用程序开发人员主要是使用该层封装好的 api 进行快速开发。
+            5. applications:该层是 java 的应用程序层,android 内置的 googlemaps、e-mail、即时通 信工具、浏览器、mp3 播放
+            器等处于该层,java 开发人员开发的程序也处于该层,而且和 内置的应用程序具有平等的位置,可以调用内置的应用程序,也可以替换内置的应用程序。
+        </answer>
+    </item>
+    <item>
+        <question>
+            android 应用对内存是如何限制的?我们应该如何合理使用内存?
+        </question>
+        <answer>
+            如何限制的?
+            Android 应用的开发语言为 Java,每个应用最大可使用的堆内存受到 Android 系统的限制
+            •Android 每一个应用的堆内存大小有限
+            •通常的情况为 16M-48M
+            •通过 ActivityManager 的 getMemoryClass()来查询可用堆内存限制
+            •3.0(HoneyComb)以上的版本可以通过 largeHeap=“true”来申请更多的堆内存
+            •NexusS(4.2.1):normal 192, largeHeap 512
+            •如果试图申请的内存大于当前余下的堆内存就会引发 OutOfMemoryError()
+            •应用程序由于各方面的限制,需要注意减少内存占用,避免出现内存泄漏。
+            如何合理使用内存?
+            1、注意资源回收,像数据库,输入输出流,定位操作这样的对象,要在使用完及时关闭流。
+            2、少使用静态变量,因为系统将静态变量的优先级设定的很高,会最后回收。所以可能因为静 态变量导致该回收的没有回收。而回收了不该回收的内存。
+            3、注意大图片的缩放,如果载入的图片很大,要先经过自己程序的处理,降低分辨率等。最好 设置多种分辨率格式的图片,以减少内存消耗。
+            4、动态注册监听,把一些只有显示的时候才使用到的监听放进程序内部,而不是放在 manifesat 中去。
+            5、减少使用动画,或者适当减少动画的帧数。
+            6、注意自己的程序逻辑,在该关闭自己程序的控件的时候,主动关闭,不要交给系统去决定。 (这个要自己把握好,也不是说都自己搞定,只有那些自己确定需要关闭的对象,自己将其关闭。)
+        </answer>
+    </item>
+    <item>
+        <question>1、你所知道的设计模式有哪些</question>
+        <answer>Java 中一般认为有 23 种设计模式，我们不需要所有的都会，但是其中常用的几种设计模式应该去掌
+            握。下面列出了所有的设计模式。需要掌握的设计模式我单独列出来了，当然能掌握的越多越好。
+            总体来说设计模式分为三大类：
+            创建型模式，共五种：工厂方法模式、抽象工厂模式、单例模式、建造者模式、原型模式。
+            结构型模式，共七种：适配器模式、装饰器模式、代理模式、外观模式、桥接模式、组合模式、享元
+            模式。
+            行为型模式，共十一种：策略模式、模板方法模式、观察者模式、迭代子模式、责任链模式、命令模
+            式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式。
+        </answer>
+
+    </item>
+
+
+    <item>
+        <question>3、工厂设计模式</question>
+        <answer>工厂方法模式分为三种：普通工厂模式，就是建立一个工厂类，对实现了同一接口的一些类进行实例
+            的创建。
+            多个工厂方法模式， 是对普通工厂方法模式的改进， 在普通工厂方法模式中， 如果传递的字符串出错，
+            则不能正确创建对象，而多个工厂方法模式是提供多个工厂方法，分别创建对象。
+            静态工厂方法模式，将上面的多个工厂方法模式里的方法置为静态的，不需要创建实例，直接调用即
+            可。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>2、单例设计模式</question>
+        <answer>最好理解的一种设计模式，分为懒汉式和饿汉式。
+            饿汉式
+            public class Singleton {
+            // 直接创建对象
+            public static Singleton instance = new Singleton();
+            // 私有化构造函数
+            private Singleton() {
+            }
+            // 返回对象实例
+            public static Singleton getInstance() {
+            return instance;
+            }
+            }
+            懒汉式：
+            public class Singleton {
+            // 声明变量
+            private static volatile Singleton singleton2 = null;
+            // 私有构造函数
+            private Singleton2() {
+            }
+            // 提供对外方法
+            public static Singleton2 getInstance() {
+            if (singleton2 == null) {
+            synchronized (Singleton2.class) {
+            if (singleton == null) {
+            singleton = new Singleton();
+            }
+            }
+            }
+            return singleton;
+            }
+
+        </answer>
+
+    </item>
+
+    <item>
+        <question>抽象工厂模式</question>
+        <answer>工厂方法模式有一个问题就是，类的创建依赖工厂类，也就是说，如果想要拓展程序，必须对工
+            厂类进行修改，这违背了闭包原则，所以，从设计角度考虑，有一定的问题，如何解决？就用到抽象
+            工厂模式，创建多个工厂类，这样一旦需要增加新的功能，直接增加新的工厂类就可以了，不需要修
+            改之前的代码。
+        </answer>
+    </item>
+
+    <item>
+        <question>4.建造者模式（Builder）</question>
+        <answer>工厂类模式提供的是创建单个类的模式，而建造者模式则是将各种产品集中起来进行管理，用来
+            创建复合对象，所谓复合对象就是指某个类具有不同的属性，其实建造者模式就是前面抽象工厂模式
+            和最后的Test结合起来得到的。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>5.适配器设计模式</question>
+        <answer>适配器模式将某个类的接口转换成客户端期望的另一个接口表示，目的是消除由于接口不匹配
+            所造成的类的兼容性问题。主要分为三类：类的适配器模式、对象的适配器模式、接口的适配器模式。
+            类的适配器模式：null
+            对象的适配器模式:
+            基本思路和类的适配器模式相同，只是将Adapter类作修改，这次不继承Source类，而是持有
+            Source类的实例，以达到解决兼容性的问题。
+            接口的适配器模式
+            接口的适配器是这样的：有时我们写的一个接口中有多个抽象方法，当我们写该接口的实现类时，
+            必须实现该接口的所有方法，这明显有时比较浪费，因为并不是所有的方法都是我们需要的，有时只
+            需要某一些，此处为了解决这个问题，我们引入了接口的适配器模式，借助于一个抽象类，该抽象类
+            实现了该接口，实现了所有的方法，而我们不和原始的接口打交道，只和该抽象类取得联系，所以我
+            们写一个类，继承该抽象类，重写我们需要的方法就行。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>1.Java 中引用类型都有哪些</question>
+        <answer>（ 1 ） 在虚拟机内存不足的情况下，也不会回收强引用对象。如果我们把（强引用）对象置为 null，
+            会大大加大 垃圾回收执行频率。几乎只要我们给出建议（ GC）， jvm 就会回收。
+            强引用，例如下面代码：
+            Object o=new Object();
+            Object o1=o;
+            （ 2） 对于软引用， 如果不显式的置为 null 的话， 和强引用差不多， 垃圾回收不会执行。 只会等到内
+            存不足的时候才会调用。
+            （ 3）对于弱引用，就算你不显式的把他置为 null，垃圾回收也会立即执行。
+            （ 4 ）虚引用，相当于 null。
+        </answer>
+    </item>
+
+    <item>
+        <question>2.什么是重载，什么是重写，有什么区别？</question>
+        <answer>重载(Overloading)：
+            （ 1 ）Overloading 是一个类中多态性的一种表现，让类以统一的方式处理不同类型数据的一种手段。
+            多个同名函数同时存在，具有不同的参数个数/类型。
+            （ 2）重载的时候，方法名要一样，但是参数类型和个数不一样，返回值类型可以相同，也可以不相
+            同。无法以返回型别作为重载函数的区分标准。
+            重写（ Overriding):
+            （ 1 ） 父类与子类之间的多态性， 对父类的函数进行重新定义。 即在子类中定义某方法与其父类有相
+            同的名称和参数。
+            （ 2）若子类中的方法与父类中的某一方法具有相同的方法名、返回类型和参数表，则新方法将覆盖
+            原有的方法。如需父类中原有的方法，可使用 super 关键字，该关键字引用了当前类的父类。
+        </answer>
+    </item>
+
+
+    <item>
+        <question>3.String、 StringBuffer 和 StringBuilder 的区别</question>
+        <answer>JAVA 早期平台提供了两个类： String 和 StringBuffer，它们可以储存和操作字符串，即包含多个字
+            符的字符数据。这个 String 类提供了数值不可改变的字符串。而这个 StringBuffer 类提供的字符串
+            可以进行修改。当你知道字符数据要改变的时候你就可以使用 StringBuffer。。 String 类是不可变
+            类， 任何对 String 的改变都会引发新的 String 对象的生成； 而 StringBuffer 则是可变类， 任何对
+            它所指代的字符串的改变都不会产生新的对象。
+            StringBuilder 是后面引入的， 它与 StringBuffer 类的区别在于， 新引入的 StringBuilder 类不是线
+            程安全的， 但其在单线程中的性能比 StringBuffer 高。 （ 有兴趣的可以去读下《Think in Java》 描
+            述 HashTable 和 HashMap 区别的那部分章节比较熟悉的话，就是支持线程同步保证线程安全而导
+            致性能下降的问题）
+            典型地，你可以使用 StringBuffers 来动态构造字符数据。另外， String 实现了 equals 方法,new String(“abc”
+            ).equals(newString(“abc” )的结果为 true,而 StringBuffer 没有实现 equals 方法，
+            所以， new StringBuffer(“abc” ).equals(newStringBuffer(“abc” )的结果为 false。
+        </answer>
+    </item>
+
+    <item>
+        <question>4、关键字 final 和 static 是怎么使用的</question>
+        <answer>final 有着“终态的”“这是无法改变的”含义，阻止了多态和继承。
+            具体使用有：
+            final 类不能被继承，没有子类，final 类中的方法默认是 final 的。
+            final 方法不能被子类的方法覆盖，但可以被继承。
+            final 成员变量表示常量，只能被赋值一次，赋值后值不再改变。
+            final 不能用于修饰构造方法。
+            注意：父类的 private 成员方法是不能被子类方法覆盖的，因此 private 类型的方法默认是 final 类型
+            的。
+            static 表示“全局”或者“静态”的意思，用来修饰成员变量和成员方法，也可以形成静态 static 代
+            码块，但是 Java 语言中没有全局变量的概念。
+            被 static 修饰的成员变量和成员方法独立于该类的任何对象,static 对象可以在它的任何对象创建之
+            前访问，无需引用任何对象。
+            static 前面也可用 public 或 private 来修饰，其中 private 是访问权限限定，static 表示不要实例化
+            就可以使用。
+            主要用于静态变量，静态方法，static 代码块
+            静态变量：对于静态变量在内存中只有一个拷贝（节省内存），JVM 只为静态分配一次内存，在加
+            载类的过程中完成静态变量的内存分配，可用类名直接访问（方便），当然也可以通过对象来访问（但
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            155
+            是这是不推荐的）。
+            静态方法： 静态方法可以直接通过类名调用，任何的实例也都可以调用，因此静态方法中不能用 this
+            和 super 关键字，不能直接访问所属类的实例变量和实例方法(就是不带 static 的成员变量和成员成
+            员方法)，只能访问所属类的静态成员变量和成员方法。因为实例成员与特定的对象关联！
+            static 代码块：atic 代码块也叫静态代码块，是在类中独立于类成员的 static 语句块，可以有多个，
+            位置可以随便放，它不在任何的方法体内，JVM 加载类时会执行这些静态的代码块，如果 static 代
+            码块有多个，JVM 将按照它们在类中出现的先后顺序依次执行它们，每个代码块只会被执行一次
+            static 和 final 一起使用：
+            static final 用来修饰成员变量和成员方法，可简单理解为“全局常量”！
+            对于变量，表示一旦给值就不可修改，并且通过类名可以访问。
+            对于方法，表示不可覆盖，并且可以通过类名直接访问。
+            特别要注意一个问题：
+            对于被 static 和 final 修饰过的实例常量，实例本身不能再改变了，但对于一些容器类型（比如，
+            ArrayList、HashMap）的实例变量，不可以改变容器变量本身，但可以修改容器中存放的对象，这
+            一点在编程中用到很多。
+        </answer>
+    </item>
+    <item>
+        <question>5、TCP/IP 协议簇分哪几层？TCP、IP、XMPP、HTTP、分别属于哪一层？</question>
+        <answer>通讯协议采用了 4 层的层级结构，每一层都呼叫下一层所提供的网络来完成自己的需求。这
+            4 层分别为：
+            应用层：应用程序间沟通的层，如简单电子邮件传输（SMTP）、文件传输协议（FTP）、网
+            络远程访问协议（Telnet）、超文本传输协议(HTTP)、可扩展通讯和表示协议（XMPP）等。
+            传智播客武汉校区就业部出品 务实、创新、质量、分享、专注、责任
+            156
+            传输层：在此层中，它提供了节点间的数据传送服务，如传输控制协议（TCP）、用户数据
+            报协议（UDP）等，TCP 和 UDP 给数据包加入传输数据并把它传输到下一层中，这一层负责传
+            送数据，并且确定数据已被送达并接收。
+            互连网络层：负责提供基本的数据封包传送功能，让每一块数据包都能够到达目的主机（但
+            不检查是否被正确接收），如网际协议（IP）。
+            网络接口层：对实际的网络媒体的管理，定义如何使用实际网络（如 Ethernet、SerialLine
+            等）来传送数据。
+        </answer>
+    </item>
+
+
+
+</questions>
